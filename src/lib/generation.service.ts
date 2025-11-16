@@ -4,12 +4,21 @@ import type { SupabaseClient } from "../db/supabase.client"
 import type {
   CreateGenerationResponseDto,
   GenerationFlashcardProposalDto,
+  GenerationListResponseDto,
 } from "../types"
 
 export type CreateGenerationParams = {
   supabase: SupabaseClient
   userId: string
   sourceText: string
+}
+
+export type ListGenerationsParams = {
+  supabase: SupabaseClient
+  userId: string
+  page: number
+  limit: number
+  order: "asc" | "desc"
 }
 
 export type GenerationServiceErrorCode =
@@ -92,6 +101,46 @@ export class GenerationService {
       generation_id: data.id,
       flashcards_proposals: proposals,
       generated_count: data.generated_count,
+    }
+  }
+
+  async listGenerations(
+    params: ListGenerationsParams,
+  ): Promise<GenerationListResponseDto> {
+    const { supabase, userId, page, limit, order } = params
+
+    const offset = (page - 1) * limit
+    const ascending = order === "asc"
+
+    const { data, error, count } = await supabase
+      .from("generations")
+      .select(
+        "id, generated_count, accepted_edited_count, accepted_unedited_count, source_text_length, created_at, updated_at",
+        { count: "exact" },
+      )
+      .eq("user_id", userId)
+      .order("created_at", { ascending })
+      .range(offset, offset + limit - 1)
+
+    if (error || !data || typeof count !== "number") {
+      throw new Error("Failed to list generations")
+    }
+
+    return {
+      data: data.map((row) => ({
+        id: row.id,
+        generated_count: row.generated_count,
+        accepted_edited_count: row.accepted_edited_count,
+        accepted_unedited_count: row.accepted_unedited_count,
+        source_text_length: row.source_text_length,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+      })),
+      pagination: {
+        page,
+        limit,
+        total: count,
+      },
     }
   }
 

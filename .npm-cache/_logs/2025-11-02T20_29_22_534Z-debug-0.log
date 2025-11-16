@@ -1,0 +1,67 @@
+0 verbose cli /opt/homebrew/Cellar/node/23.7.0/bin/node /opt/homebrew/bin/npm
+1 info using npm@11.5.2
+2 info using node@v23.7.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/lukasz/Workspace/10x-cards/.npmrc
+5 silly config load:file:/Users/lukasz/.npmrc
+6 silly config load:file:/opt/homebrew/etc/npmrc
+7 verbose title npm i zod
+8 verbose argv "i" "zod" "--no-audit" "--no-fund"
+9 verbose logfile logs-max:10 dir:/Users/lukasz/Workspace/10x-cards/.npm-cache/_logs/2025-11-02T20_29_22_534Z-
+10 verbose logfile /Users/lukasz/Workspace/10x-cards/.npm-cache/_logs/2025-11-02T20_29_22_534Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+13 http fetch GET https://registry.npmjs.org/npm attempt 1 failed with ENOTFOUND
+14 silly idealTree buildDeps
+15 silly fetch manifest zod@*
+16 silly packumentCache full:https://registry.npmjs.org/zod cache-miss
+17 http fetch GET https://registry.npmjs.org/zod attempt 1 failed with ENOTFOUND
+18 http fetch GET https://registry.npmjs.org/npm attempt 2 failed with ENOTFOUND
+19 http fetch GET https://registry.npmjs.org/zod attempt 2 failed with ENOTFOUND
+20 http fetch GET https://registry.npmjs.org/npm attempt 3 failed with ENOTFOUND
+21 http fetch GET https://registry.npmjs.org/zod attempt 3 failed with ENOTFOUND
+22 silly placeDep ROOT zod@ REPLACE for: 10x-astro-starter@0.0.1 want: *
+23 silly fetch manifest zod-to-json-schema@^3.24.6
+24 silly packumentCache full:https://registry.npmjs.org/zod-to-json-schema cache-miss
+25 http fetch GET https://registry.npmjs.org/zod-to-json-schema attempt 1 failed with ENOTFOUND
+26 http fetch GET https://registry.npmjs.org/zod-to-json-schema attempt 2 failed with ENOTFOUND
+27 http fetch GET https://registry.npmjs.org/zod-to-json-schema attempt 3 failed with ENOTFOUND
+28 silly fetch manifest zod-to-ts@^1.2.0
+29 silly packumentCache full:https://registry.npmjs.org/zod-to-ts cache-miss
+30 http fetch GET https://registry.npmjs.org/zod-to-ts attempt 1 failed with ENOTFOUND
+31 http fetch GET https://registry.npmjs.org/zod-to-ts attempt 2 failed with ENOTFOUND
+32 http fetch GET https://registry.npmjs.org/zod-to-ts attempt 3 failed with ENOTFOUND
+33 silly placeDep node_modules/astro zod-to-json-schema@ OK for: astro@5.13.7 want: ^3.24.6
+34 silly placeDep node_modules/astro zod-to-ts@ OK for: astro@5.13.7 want: ^1.2.0
+35 silly fetch manifest zod-validation-error@^3.0.3
+36 silly packumentCache full:https://registry.npmjs.org/zod-validation-error cache-miss
+37 http fetch GET https://registry.npmjs.org/zod-validation-error attempt 1 failed with ENOTFOUND
+38 http fetch GET https://registry.npmjs.org/zod-validation-error attempt 2 failed with ENOTFOUND
+39 http fetch GET https://registry.npmjs.org/zod-validation-error attempt 3 failed with ENOTFOUND
+40 silly placeDep node_modules/eslint-plugin-react-compiler zod-validation-error@ OK for: eslint-plugin-react-compiler@19.0.0-beta-aeaed83-20250323 want: ^3.0.3
+41 verbose type system
+42 verbose stack FetchError: request to https://registry.npmjs.org/zod failed, reason: getaddrinfo ENOTFOUND registry.npmjs.org
+42 verbose stack     at ClientRequest.<anonymous> (/opt/homebrew/lib/node_modules/npm/node_modules/minipass-fetch/lib/index.js:130:14)
+42 verbose stack     at ClientRequest.emit (node:events:507:28)
+42 verbose stack     at emitErrorEvent (node:_http_client:104:11)
+42 verbose stack     at _destroy (node:_http_client:898:9)
+42 verbose stack     at onSocketNT (node:_http_client:918:5)
+42 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:91:21)
+43 error code ENOTFOUND
+44 error syscall getaddrinfo
+45 error errno ENOTFOUND
+46 error network request to https://registry.npmjs.org/zod failed, reason: getaddrinfo ENOTFOUND registry.npmjs.org
+47 error network This is a problem related to network connectivity.
+47 error network In most cases you are behind a proxy or have bad network settings.
+47 error network
+47 error network If you are behind a proxy, please make sure that the
+47 error network 'proxy' config is set properly.  See: 'npm help config'
+48 silly unfinished npm timer reify 1762115362673
+49 silly unfinished npm timer reify:loadTrees 1762115362674
+50 verbose cwd /Users/lukasz/Workspace/10x-cards
+51 verbose os Darwin 24.6.0
+52 verbose node v23.7.0
+53 verbose npm  v11.5.2
+54 verbose exit 1
+55 verbose code 1
+56 error A complete log of this run can be found in: /Users/lukasz/Workspace/10x-cards/.npm-cache/_logs/2025-11-02T20_29_22_534Z-debug-0.log

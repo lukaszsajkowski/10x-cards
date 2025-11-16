@@ -20,3 +20,11 @@ export type CreateGenerationCommandInput = z.infer<
   typeof createGenerationCommandSchema
 >
 
+export const generationListQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+  order: z.enum(["asc", "desc"]).default("desc"),
+})
+
+export type GenerationListQueryInput = z.infer<typeof generationListQuerySchema>
+

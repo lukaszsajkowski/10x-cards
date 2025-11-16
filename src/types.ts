@@ -148,6 +148,16 @@ export type GenerationListQueryDto = {
 }
 
 /**
+ * Query model for generation error logs listings (`GET /generation-error-logs`).
+ */
+export type GenerationErrorLogListQueryDto = {
+  page?: number
+  limit?: number
+  order?: "asc" | "desc"
+  user_id?: string
+}
+
+/**
  * Detailed representation of a single generation including its flashcards.
  * Excludes `user_id` because it is handled by authentication context.
  */

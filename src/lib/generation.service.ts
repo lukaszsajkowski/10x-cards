@@ -6,6 +6,7 @@ import type {
   GenerationFlashcardProposalDto,
   GenerationListResponseDto,
   GenerationDetailDto,
+  GenerationErrorLogListResponseDto,
 } from "../types"
 
 export type CreateGenerationParams = {
@@ -26,6 +27,14 @@ export type GetGenerationDetailParams = {
   supabase: SupabaseClient
   userId: string
   generationId: string
+}
+
+export type ListGenerationErrorLogsParams = {
+  supabase: SupabaseClient
+  userId: string
+  page: number
+  limit: number
+  order: "asc" | "desc"
 }
 
 export type GenerationServiceErrorCode =
@@ -142,6 +151,46 @@ export class GenerationService {
         source_text_length: row.source_text_length,
         created_at: row.created_at,
         updated_at: row.updated_at,
+      })),
+      pagination: {
+        page,
+        limit,
+        total: count,
+      },
+    }
+  }
+
+  async listGenerationErrorLogs(
+    params: ListGenerationErrorLogsParams,
+  ): Promise<GenerationErrorLogListResponseDto> {
+    const { supabase, userId, page, limit, order } = params
+
+    const offset = (page - 1) * limit
+    const ascending = order === "asc"
+
+    const { data, error, count } = await supabase
+      .from("generation_error_logs")
+      .select(
+        "id, model, source_text_hash, source_text_length, error_code, error_message, created_at",
+        { count: "exact" },
+      )
+      .eq("user_id", userId)
+      .order("created_at", { ascending })
+      .range(offset, offset + limit - 1)
+
+    if (error || !data || typeof count !== "number") {
+      throw new Error("Failed to list generation error logs")
+    }
+
+    return {
+      data: data.map((row) => ({
+        id: row.id,
+        model: row.model,
+        source_text_hash: row.source_text_hash,
+        source_text_length: row.source_text_length,
+        error_code: row.error_code,
+        error_message: row.error_message,
+        created_at: row.created_at,
       })),
       pagination: {
         page,

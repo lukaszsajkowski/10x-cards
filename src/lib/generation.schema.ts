@@ -28,3 +28,9 @@ export const generationListQuerySchema = z.object({
 
 export type GenerationListQueryInput = z.infer<typeof generationListQuerySchema>
 
+export const generationIdParamSchema = z.object({
+  id: z.string().uuid(),
+})
+
+export type GenerationIdParamInput = z.infer<typeof generationIdParamSchema>
+

@@ -5,6 +5,7 @@ import type {
   CreateGenerationResponseDto,
   GenerationFlashcardProposalDto,
   GenerationListResponseDto,
+  GenerationDetailDto,
 } from "../types"
 
 export type CreateGenerationParams = {
@@ -19,6 +20,12 @@ export type ListGenerationsParams = {
   page: number
   limit: number
   order: "asc" | "desc"
+}
+
+export type GetGenerationDetailParams = {
+  supabase: SupabaseClient
+  userId: string
+  generationId: string
 }
 
 export type GenerationServiceErrorCode =
@@ -141,6 +148,65 @@ export class GenerationService {
         limit,
         total: count,
       },
+    }
+  }
+
+  async getGenerationDetail(
+    params: GetGenerationDetailParams,
+  ): Promise<GenerationDetailDto | null> {
+    const { supabase, userId, generationId } = params
+
+    const { data: generationRow, error: generationError } = await supabase
+      .from("generations")
+      .select(
+        "id, source_text, source_text_length, generated_count, accepted_edited_count, accepted_unedited_count, created_at, updated_at",
+      )
+      .eq("id", generationId)
+      .eq("user_id", userId)
+      .maybeSingle()
+
+    if (generationError) {
+      throw new Error("Failed to fetch generation")
+    }
+
+    if (!generationRow) {
+      return null
+    }
+
+    const {
+      data: flashcardsData,
+      error: flashcardsError,
+    } = await supabase
+      .from("flashcards")
+      .select(
+        "id, front, back, source, created_at, updated_at, generation_id",
+      )
+      .eq("generation_id", generationId)
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true })
+
+    if (flashcardsError || !flashcardsData) {
+      throw new Error("Failed to fetch flashcards")
+    }
+
+    return {
+      id: generationRow.id,
+      source_text: generationRow.source_text,
+      source_text_length: generationRow.source_text_length,
+      generated_count: generationRow.generated_count,
+      accepted_edited_count: generationRow.accepted_edited_count,
+      accepted_unedited_count: generationRow.accepted_unedited_count,
+      created_at: generationRow.created_at,
+      updated_at: generationRow.updated_at,
+      flashcards: flashcardsData.map((row) => ({
+        id: row.id,
+        front: row.front,
+        back: row.back,
+        source: row.source,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        generation_id: row.generation_id,
+      })),
     }
   }
 

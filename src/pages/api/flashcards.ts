@@ -3,6 +3,7 @@ import type { APIRoute } from "astro"
 import { DEFAULT_USER_ID } from "../../db/supabase.client"
 import {
   createFlashcardsCommandSchema,
+  flashcardListQuerySchema,
 } from "../../lib/flashcard.schema"
 import {
   FlashcardServiceError,
@@ -14,6 +15,65 @@ export const prerender = false
 const JSON_HEADERS = {
   "content-type": "application/json",
 } as const
+
+export const GET: APIRoute = async ({ url, locals }) => {
+  const supabase = locals.supabase
+
+  if (!supabase) {
+    return new Response(
+      JSON.stringify({ message: "Supabase client not available" }),
+      {
+        status: 500,
+        headers: JSON_HEADERS,
+      },
+    )
+  }
+
+  const parsedQuery = flashcardListQuerySchema.safeParse({
+    page: url.searchParams.get("page") ?? undefined,
+    limit: url.searchParams.get("limit") ?? undefined,
+    sort: url.searchParams.get("sort") ?? undefined,
+    order: url.searchParams.get("order") ?? undefined,
+    source: url.searchParams.get("source") ?? undefined,
+    generation_id: url.searchParams.get("generation_id") ?? undefined,
+  })
+
+  if (!parsedQuery.success) {
+    return new Response(
+      JSON.stringify({
+        message: "Validation error",
+        errors: parsedQuery.error.flatten().fieldErrors,
+      }),
+      {
+        status: 400,
+        headers: JSON_HEADERS,
+      },
+    )
+  }
+
+  try {
+    const result = await flashcardService.listFlashcards({
+      supabase,
+      userId: DEFAULT_USER_ID,
+      query: parsedQuery.data,
+    })
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: JSON_HEADERS,
+    })
+  } catch (error) {
+    console.error("Failed to fetch flashcards", error)
+
+    return new Response(
+      JSON.stringify({ message: "Failed to fetch flashcards" }),
+      {
+        status: 500,
+        headers: JSON_HEADERS,
+      },
+    )
+  }
+}
 
 export const POST: APIRoute = async ({ request, locals }) => {
   const supabase = locals.supabase

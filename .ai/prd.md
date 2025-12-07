@@ -64,6 +64,7 @@ Kryteria akceptacji:
 - Po podaniu prawidłowych danych logowania użytkownik zostaje przekierowany do widoku generowania fiszek.
 - Błędne dane logowania wyświetlają komunikat o nieprawidłowych danych.
 - Dane dotyczące logowania przechowywane są w bezpieczny sposób.
+- Chcę mieć mozliwość resetowania hasła.
 
 ID: US-003
 Tytuł: Generowanie fiszek przy użyciu AI

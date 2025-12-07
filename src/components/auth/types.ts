@@ -1,7 +1,7 @@
 /**
  * Tryb formularza autoryzacji
  */
-export type AuthMode = "login" | "register";
+export type AuthMode = "login" | "register" | "reset-password" | "update-password";
 
 /**
  * Dane formularza autoryzacji
@@ -81,6 +81,18 @@ export const SUPABASE_ERROR_MESSAGES: Record<string, string> = {
   "User already registered": "Użytkownik z tym adresem email już istnieje",
   "Password should be at least 6 characters": "Hasło musi mieć minimum 6 znaków",
   "Unable to validate email address: invalid format": "Nieprawidłowy format adresu email",
+  "Email rate limit exceeded": "Zbyt wiele prób. Spróbuj ponownie później",
+  "Invalid token": "Link resetowania hasła wygasł lub jest nieprawidłowy",
+  "New password should be different from the old password": "Nowe hasło musi być inne niż poprzednie",
   // Domyślny komunikat dla nieznanych błędów
   default: "Wystąpił błąd podczas autoryzacji. Spróbuj ponownie.",
 };
+
+/**
+ * Komunikaty sukcesu
+ */
+export const AUTH_SUCCESS_MESSAGES = {
+  RESET_PASSWORD_EMAIL_SENT: "Link do resetowania hasła został wysłany na podany adres email",
+  PASSWORD_UPDATED: "Hasło zostało zmienione. Możesz się teraz zalogować",
+  REGISTRATION_EMAIL_SENT: "Sprawdź swoją skrzynkę email i potwierdź rejestrację",
+} as const;

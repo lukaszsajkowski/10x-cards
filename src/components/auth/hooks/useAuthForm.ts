@@ -12,9 +12,15 @@ import {
   AUTH_VALIDATION,
   AUTH_ERROR_MESSAGES,
   SUPABASE_ERROR_MESSAGES,
+  AUTH_SUCCESS_MESSAGES,
 } from "../types";
 
-export function useAuthForm(mode: AuthMode): AuthFormState & AuthFormActions {
+// Rozszerzony typ stanu o successMessage
+interface ExtendedAuthFormState extends AuthFormState {
+  successMessage: string | null;
+}
+
+export function useAuthForm(mode: AuthMode): ExtendedAuthFormState & AuthFormActions {
   // Stan formularza
   const [formData, setFormData] = useState<AuthFormData>({
     email: "",
@@ -30,27 +36,35 @@ export function useAuthForm(mode: AuthMode): AuthFormState & AuthFormActions {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Walidacja
+  // Walidacja zależna od trybu
   const errors = useMemo((): AuthFormValidationErrors => {
     const result: AuthFormValidationErrors = {};
 
-    // Walidacja email
-    if (!formData.email.trim()) {
-      result.email = AUTH_ERROR_MESSAGES.EMAIL_REQUIRED;
-    } else if (!AUTH_VALIDATION.EMAIL_REGEX.test(formData.email)) {
-      result.email = AUTH_ERROR_MESSAGES.EMAIL_INVALID;
+    // Walidacja email (dla login, register, reset-password)
+    const requiresEmail = mode === "login" || mode === "register" || mode === "reset-password";
+    if (requiresEmail) {
+      if (!formData.email.trim()) {
+        result.email = AUTH_ERROR_MESSAGES.EMAIL_REQUIRED;
+      } else if (!AUTH_VALIDATION.EMAIL_REGEX.test(formData.email)) {
+        result.email = AUTH_ERROR_MESSAGES.EMAIL_INVALID;
+      }
     }
 
-    // Walidacja hasła
-    if (!formData.password) {
-      result.password = AUTH_ERROR_MESSAGES.PASSWORD_REQUIRED;
-    } else if (formData.password.length < AUTH_VALIDATION.PASSWORD_MIN_LENGTH) {
-      result.password = AUTH_ERROR_MESSAGES.PASSWORD_TOO_SHORT;
+    // Walidacja hasła (dla login, register, update-password)
+    const requiresPassword = mode === "login" || mode === "register" || mode === "update-password";
+    if (requiresPassword) {
+      if (!formData.password) {
+        result.password = AUTH_ERROR_MESSAGES.PASSWORD_REQUIRED;
+      } else if (formData.password.length < AUTH_VALIDATION.PASSWORD_MIN_LENGTH) {
+        result.password = AUTH_ERROR_MESSAGES.PASSWORD_TOO_SHORT;
+      }
     }
 
-    // Walidacja potwierdzenia hasła (tylko register)
-    if (mode === "register") {
+    // Walidacja potwierdzenia hasła (dla register i update-password)
+    const requiresConfirmPassword = mode === "register" || mode === "update-password";
+    if (requiresConfirmPassword) {
       if (!formData.confirmPassword) {
         result.confirmPassword = AUTH_ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED;
       } else if (formData.password !== formData.confirmPassword) {
@@ -75,6 +89,7 @@ export function useAuthForm(mode: AuthMode): AuthFormState & AuthFormActions {
       setFormData((prev) => ({ ...prev, [field]: value }));
       // Wyczyść błąd auth przy edycji
       setAuthError(null);
+      setSuccessMessage(null);
     },
     []
   );
@@ -92,13 +107,19 @@ export function useAuthForm(mode: AuthMode): AuthFormState & AuthFormActions {
     async (e: React.FormEvent) => {
       e.preventDefault();
 
-      // Oznacz wszystkie pola jako touched
-      setTouched({ email: true, password: true, confirmPassword: true });
+      // Oznacz odpowiednie pola jako touched w zależności od trybu
+      const touchedFields: AuthFormTouched = {
+        email: mode !== "update-password",
+        password: mode !== "reset-password",
+        confirmPassword: mode === "register" || mode === "update-password",
+      };
+      setTouched(touchedFields);
 
       if (!isValid) return;
 
       setIsSubmitting(true);
       setAuthError(null);
+      setSuccessMessage(null);
 
       try {
         if (mode === "login") {
@@ -108,17 +129,41 @@ export function useAuthForm(mode: AuthMode): AuthFormState & AuthFormActions {
           });
 
           if (error) throw error;
-        } else {
+
+          // Przekierowanie po sukcesie logowania
+          window.location.href = "/generate";
+        } else if (mode === "register") {
           const { error } = await supabaseClient.auth.signUp({
             email: formData.email,
             password: formData.password,
           });
 
           if (error) throw error;
-        }
 
-        // Przekierowanie po sukcesie
-        window.location.href = "/generate";
+          // Przekierowanie po sukcesie rejestracji
+          window.location.href = "/generate";
+        } else if (mode === "reset-password") {
+          const { error } = await supabaseClient.auth.resetPasswordForEmail(
+            formData.email,
+            {
+              redirectTo: `${window.location.origin}/auth/update-password`,
+            }
+          );
+
+          if (error) throw error;
+
+          // Wyświetl komunikat sukcesu
+          setSuccessMessage(AUTH_SUCCESS_MESSAGES.RESET_PASSWORD_EMAIL_SENT);
+        } else if (mode === "update-password") {
+          const { error } = await supabaseClient.auth.updateUser({
+            password: formData.password,
+          });
+
+          if (error) throw error;
+
+          // Przekierowanie do logowania po zmianie hasła
+          window.location.href = "/auth/login?message=password-updated";
+        }
       } catch (error) {
         const message =
           error instanceof Error
@@ -140,6 +185,7 @@ export function useAuthForm(mode: AuthMode): AuthFormState & AuthFormActions {
     isSubmitting,
     authError,
     isValid,
+    successMessage,
     // Akcje
     setFieldValue,
     setFieldTouched,

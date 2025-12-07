@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { AuthError } from "./AuthError";
 import { AuthFormFields } from "./AuthFormFields";
 import { AuthLinks } from "./AuthLinks";
+import { ResetPasswordSuccess } from "./ResetPasswordSuccess";
 import { useAuthForm } from "./hooks";
 import type { AuthMode } from "./types";
 
@@ -31,6 +32,18 @@ const FORM_CONFIG = {
     submitText: "Zarejestruj się",
     loadingText: "Rejestracja...",
   },
+  "reset-password": {
+    title: "Resetuj hasło",
+    description: "Podaj adres email, na który wyślemy link do resetowania hasła",
+    submitText: "Wyślij link",
+    loadingText: "Wysyłanie...",
+  },
+  "update-password": {
+    title: "Ustaw nowe hasło",
+    description: "Wprowadź nowe hasło dla swojego konta",
+    submitText: "Zmień hasło",
+    loadingText: "Zapisywanie...",
+  },
 } as const;
 
 export function AuthForm({ mode }: AuthFormProps) {
@@ -41,12 +54,18 @@ export function AuthForm({ mode }: AuthFormProps) {
     isSubmitting,
     authError,
     isValid,
+    successMessage,
     setFieldValue,
     setFieldTouched,
     handleSubmit,
   } = useAuthForm(mode);
 
   const config = FORM_CONFIG[mode];
+
+  // Wyświetl komunikat sukcesu dla reset-password
+  if (successMessage && mode === "reset-password") {
+    return <ResetPasswordSuccess message={successMessage} />;
+  }
 
   return (
     <Card className="w-full max-w-md">

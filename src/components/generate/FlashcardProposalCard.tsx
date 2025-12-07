@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useId } from "react";
+import { useState, useCallback, useMemo, useId, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -9,12 +9,7 @@ import { cn } from "@/lib/utils";
 /**
  * Pojedyncza karta propozycji fiszki z możliwością podglądu, edycji, akceptacji i odrzucenia.
  */
-export function FlashcardProposalCard({
-  proposal,
-  onUpdate,
-  onAccept,
-  onReject,
-}: FlashcardProposalCardProps) {
+export function FlashcardProposalCard({ proposal, onUpdate, onAccept, onReject }: FlashcardProposalCardProps) {
   const frontId = useId();
   const backId = useId();
   const frontErrorId = useId();
@@ -23,12 +18,17 @@ export function FlashcardProposalCard({
   const [localFront, setLocalFront] = useState(proposal.front);
   const [localBack, setLocalBack] = useState(proposal.back);
 
+  // Synchronizuj lokalny stan gdy proposal się zmienia (ale nie podczas aktywnej edycji)
+  useEffect(() => {
+    if (!proposal.isEditing) {
+      setLocalFront(proposal.front);
+      setLocalBack(proposal.back);
+    }
+  }, [proposal.front, proposal.back, proposal.isEditing]);
+
   // Sprawdź czy propozycja została edytowana
   const isEdited = useMemo(() => {
-    return (
-      proposal.front !== proposal.originalFront ||
-      proposal.back !== proposal.originalBack
-    );
+    return proposal.front !== proposal.originalFront || proposal.back !== proposal.originalBack;
   }, [proposal.front, proposal.back, proposal.originalFront, proposal.originalBack]);
 
   // Walidacja lokalna podczas edycji
@@ -72,15 +72,7 @@ export function FlashcardProposalCard({
       setLocalBack(proposal.back);
       onUpdate({ isEditing: true });
     }
-  }, [
-    proposal.isEditing,
-    proposal.front,
-    proposal.back,
-    hasValidationErrors,
-    localFront,
-    localBack,
-    onUpdate,
-  ]);
+  }, [proposal.isEditing, proposal.front, proposal.back, hasValidationErrors, localFront, localBack, onUpdate]);
 
   // Obsługa akceptacji
   const handleAccept = useCallback(() => {
@@ -112,12 +104,7 @@ export function FlashcardProposalCard({
   }, [proposal.isRejected, proposal.isAccepted, isEdited]);
 
   return (
-    <Card
-      className={cn(
-        "transition-opacity duration-200",
-        proposal.isRejected && "opacity-50"
-      )}
-    >
+    <Card className={cn("transition-opacity duration-200", proposal.isRejected && "opacity-50")}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Propozycja fiszki</span>
@@ -138,8 +125,7 @@ export function FlashcardProposalCard({
                 onChange={(e) => setLocalFront(e.target.value)}
                 className={cn(
                   "min-h-[60px] resize-none",
-                  localValidationErrors.front &&
-                    "border-destructive focus-visible:ring-destructive"
+                  localValidationErrors.front && "border-destructive focus-visible:ring-destructive"
                 )}
                 aria-invalid={!!localValidationErrors.front}
                 aria-describedby={localValidationErrors.front ? frontErrorId : undefined}
@@ -168,8 +154,7 @@ export function FlashcardProposalCard({
                 onChange={(e) => setLocalBack(e.target.value)}
                 className={cn(
                   "min-h-[100px] resize-none",
-                  localValidationErrors.back &&
-                    "border-destructive focus-visible:ring-destructive"
+                  localValidationErrors.back && "border-destructive focus-visible:ring-destructive"
                 )}
                 aria-invalid={!!localValidationErrors.back}
                 aria-describedby={localValidationErrors.back ? backErrorId : undefined}

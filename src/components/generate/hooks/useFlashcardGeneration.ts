@@ -6,11 +6,7 @@ import type {
   CreateFlashcardsResponseDto,
   FlashcardDraftCommand,
 } from "@/types";
-import type {
-  FlashcardProposalViewModel,
-  GenerationViewState,
-  SourceTextValidationResult,
-} from "../types";
+import type { FlashcardProposalViewModel, GenerationViewState, SourceTextValidationResult } from "../types";
 import { VALIDATION_LIMITS } from "../types";
 
 const LOCAL_STORAGE_KEY = "flashcard-generator-draft";
@@ -60,8 +56,7 @@ export function useFlashcardGeneration() {
   const sourceTextValidation: SourceTextValidationResult = useMemo(() => {
     const characterCount = sourceText.length;
     const isValid =
-      characterCount >= VALIDATION_LIMITS.SOURCE_TEXT_MIN &&
-      characterCount <= VALIDATION_LIMITS.SOURCE_TEXT_MAX;
+      characterCount >= VALIDATION_LIMITS.SOURCE_TEXT_MIN && characterCount <= VALIDATION_LIMITS.SOURCE_TEXT_MAX;
 
     let error: string | null = null;
     if (characterCount > 0 && characterCount < VALIDATION_LIMITS.SOURCE_TEXT_MIN) {
@@ -93,95 +88,78 @@ export function useFlashcardGeneration() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `Błąd serwera (${response.status})`
-        );
+        throw new Error(errorData.message || `Błąd serwera (${response.status})`);
       }
 
       const data: CreateGenerationResponseDto = await response.json();
 
       // Transformuj propozycje z API na ViewModel
-      const proposalViewModels: FlashcardProposalViewModel[] =
-        data.flashcards_proposals.map((proposal) => ({
-          id: crypto.randomUUID(),
-          front: proposal.front,
-          back: proposal.back,
-          originalFront: proposal.front,
-          originalBack: proposal.back,
-          isAccepted: true, // Domyślnie zaakceptowane
-          isRejected: false,
-          isEditing: false,
-          validationErrors: {},
-        }));
+      const proposalViewModels: FlashcardProposalViewModel[] = data.flashcards_proposals.map((proposal) => ({
+        id: crypto.randomUUID(),
+        front: proposal.front,
+        back: proposal.back,
+        originalFront: proposal.front,
+        originalBack: proposal.back,
+        isAccepted: true, // Domyślnie zaakceptowane
+        isRejected: false,
+        isEditing: false,
+        validationErrors: {},
+      }));
 
       setProposals(proposalViewModels);
       setGenerationId(data.generation_id);
       setViewState({ status: "review", generationId: data.generation_id });
     } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Wystąpił nieoczekiwany błąd podczas generowania";
+      const message = err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd podczas generowania";
       setError(message);
       setViewState({ status: "error", message });
     }
   }, [sourceText, sourceTextValidation.isValid]);
 
   // Aktualizacja propozycji
-  const updateProposal = useCallback(
-    (id: string, updates: Partial<FlashcardProposalViewModel>) => {
-      setProposals((prev) =>
-        prev.map((p) => {
-          if (p.id !== id) return p;
+  const updateProposal = useCallback((id: string, updates: Partial<FlashcardProposalViewModel>) => {
+    setProposals((prev) =>
+      prev.map((p) => {
+        if (p.id !== id) return p;
 
-          const updated = { ...p, ...updates };
+        const updated = { ...p, ...updates };
 
-          // Walidacja przy aktualizacji front/back
-          if ("front" in updates || "back" in updates) {
-            const validationErrors: { front?: string; back?: string } = {};
+        // Walidacja przy aktualizacji front/back
+        if ("front" in updates || "back" in updates) {
+          const validationErrors: { front?: string; back?: string } = {};
 
-            const front = updates.front ?? p.front;
-            const back = updates.back ?? p.back;
+          const front = updates.front ?? p.front;
+          const back = updates.back ?? p.back;
 
-            if (!front.trim()) {
-              validationErrors.front = "Pole wymagane";
-            } else if (front.length > VALIDATION_LIMITS.FRONT_MAX) {
-              validationErrors.front = `Maksymalnie ${VALIDATION_LIMITS.FRONT_MAX} znaków`;
-            }
-
-            if (!back.trim()) {
-              validationErrors.back = "Pole wymagane";
-            } else if (back.length > VALIDATION_LIMITS.BACK_MAX) {
-              validationErrors.back = `Maksymalnie ${VALIDATION_LIMITS.BACK_MAX} znaków`;
-            }
-
-            updated.validationErrors = validationErrors;
+          if (!front.trim()) {
+            validationErrors.front = "Pole wymagane";
+          } else if (front.length > VALIDATION_LIMITS.FRONT_MAX) {
+            validationErrors.front = `Maksymalnie ${VALIDATION_LIMITS.FRONT_MAX} znaków`;
           }
 
-          return updated;
-        })
-      );
-    },
-    []
-  );
+          if (!back.trim()) {
+            validationErrors.back = "Pole wymagane";
+          } else if (back.length > VALIDATION_LIMITS.BACK_MAX) {
+            validationErrors.back = `Maksymalnie ${VALIDATION_LIMITS.BACK_MAX} znaków`;
+          }
+
+          updated.validationErrors = validationErrors;
+        }
+
+        return updated;
+      })
+    );
+  }, []);
 
   // Akceptacja propozycji
   const acceptProposal = useCallback((id: string) => {
-    setProposals((prev) =>
-      prev.map((p) =>
-        p.id === id ? { ...p, isAccepted: true, isRejected: false } : p
-      )
-    );
+    setProposals((prev) => prev.map((p) => (p.id === id ? { ...p, isAccepted: true, isRejected: false } : p)));
   }, []);
 
   // Odrzucenie propozycji
   const rejectProposal = useCallback((id: string) => {
     setProposals((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? { ...p, isRejected: true, isAccepted: false, isEditing: false }
-          : p
-      )
+      prev.map((p) => (p.id === id ? { ...p, isRejected: true, isAccepted: false, isEditing: false } : p))
     );
   }, []);
 
@@ -200,10 +178,7 @@ export function useFlashcardGeneration() {
   // Sprawdź czy są błędy walidacji w zaakceptowanych
   const hasValidationErrors = useMemo(() => {
     return proposals.some(
-      (p) =>
-        p.isAccepted &&
-        !p.isRejected &&
-        (p.validationErrors.front || p.validationErrors.back)
+      (p) => p.isAccepted && !p.isRejected && (p.validationErrors.front || p.validationErrors.back)
     );
   }, [proposals]);
 
@@ -215,13 +190,10 @@ export function useFlashcardGeneration() {
     setError(null);
 
     try {
-      const acceptedProposals = proposals.filter(
-        (p) => p.isAccepted && !p.isRejected
-      );
+      const acceptedProposals = proposals.filter((p) => p.isAccepted && !p.isRejected);
 
       const flashcards: FlashcardDraftCommand[] = acceptedProposals.map((p) => {
-        const isEdited =
-          p.front !== p.originalFront || p.back !== p.originalBack;
+        const isEdited = p.front !== p.originalFront || p.back !== p.originalBack;
 
         return {
           front: p.front,
@@ -241,9 +213,7 @@ export function useFlashcardGeneration() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `Błąd podczas zapisywania (${response.status})`
-        );
+        throw new Error(errorData.message || `Błąd podczas zapisywania (${response.status})`);
       }
 
       const data: CreateFlashcardsResponseDto = await response.json();
@@ -260,10 +230,7 @@ export function useFlashcardGeneration() {
       setGenerationId(null);
       setSourceTextState("");
     } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Wystąpił błąd podczas zapisywania fiszek";
+      const message = err instanceof Error ? err.message : "Wystąpił błąd podczas zapisywania fiszek";
       setError(message);
       setViewState({ status: "error", message });
     }
@@ -272,10 +239,17 @@ export function useFlashcardGeneration() {
   // Czyszczenie błędu
   const clearError = useCallback(() => {
     setError(null);
-    if (viewState.status === "error") {
-      setViewState({ status: proposals.length > 0 ? "review" : "idle", generationId: generationId || "" });
-    }
-  }, [viewState.status, proposals.length, generationId]);
+    // Użyj funkcyjnego update aby uniknąć stale closure z viewState
+    setViewState((currentState) => {
+      if (currentState.status === "error") {
+        return {
+          status: proposals.length > 0 ? "review" : "idle",
+          generationId: generationId || "",
+        };
+      }
+      return currentState;
+    });
+  }, [proposals.length, generationId]);
 
   // Reset do stanu początkowego
   const resetToInitial = useCallback(() => {

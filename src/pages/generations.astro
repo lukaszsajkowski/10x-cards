@@ -1,42 +1,12 @@
 ---
 import AppShellLayout from "../layouts/AppShellLayout.astro";
+import { GenerationsView } from "../components/generations";
 
 export const prerender = false;
 ---
 
 <AppShellLayout title="Historia generacji | 10x Cards">
   <div class="container mx-auto px-4 py-8 max-w-4xl">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight">Historia generacji</h1>
-      <p class="text-muted-foreground mt-2">
-        Przeglądaj historię swoich generacji fiszek.
-      </p>
-    </header>
-    
-    <div class="flex flex-col items-center justify-center py-12 text-center">
-      <div class="rounded-full bg-muted p-4 mb-4">
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="48" 
-          height="48" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round"
-          class="text-muted-foreground"
-        >
-          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-          <path d="M3 3v5h5" />
-          <path d="M12 7v5l4 2" />
-        </svg>
-      </div>
-      <h2 class="text-xl font-semibold mb-2">Wkrótce dostępne</h2>
-      <p class="text-muted-foreground max-w-md">
-        Widok historii generacji jest w trakcie implementacji. 
-        Sprawdź ponownie wkrótce!
-      </p>
-    </div>
+    <GenerationsView client:load />
   </div>
 </AppShellLayout>

@@ -1,0 +1,10 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { AuthForm } from "@/components/auth";
+
+export const prerender = false;
+---
+
+<AuthLayout title="Rejestracja | 10x Cards">
+  <AuthForm client:load mode="register" />
+</AuthLayout>

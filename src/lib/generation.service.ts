@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto"
 
+import { z } from "zod"
+
 import type { SupabaseClient } from "../db/supabase.client"
 import type {
   CreateGenerationResponseDto,
@@ -8,6 +10,7 @@ import type {
   GenerationDetailDto,
   GenerationErrorLogListResponseDto,
 } from "../types"
+import { openRouterService } from "./openrouter.service"
 
 export type CreateGenerationParams = {
   supabase: SupabaseClient
@@ -52,10 +55,23 @@ export class GenerationServiceError extends Error {
   }
 }
 
-const MODEL_NAME = "mock-ai-v1"
+const MODEL_NAME = "openai/gpt-4o-mini"
 const MAX_ERROR_MESSAGE_LENGTH = 500
-const MAX_FRONT_LENGTH = 120
-const MAX_BACK_LENGTH = 320
+
+// Zod schema for AI response validation
+const flashcardProposalsSchema = z.object({
+  flashcards: z
+    .array(
+      z.object({
+        front: z.string().min(1).max(200),
+        back: z.string().min(1).max(500),
+      }),
+    )
+    .min(1)
+    .max(10),
+})
+
+type FlashcardProposals = z.infer<typeof flashcardProposalsSchema>
 
 export class GenerationService {
   async createGeneration(
@@ -66,7 +82,7 @@ export class GenerationService {
     let proposals: GenerationFlashcardProposalDto[]
 
     try {
-      proposals = await this.generateWithMockAi(sourceText)
+      proposals = await this.generateFlashcards(sourceText)
     } catch (error) {
       const serviceError =
         error instanceof GenerationServiceError ? error : undefined
@@ -259,39 +275,50 @@ export class GenerationService {
     }
   }
 
-  private async generateWithMockAi(
+  private async generateFlashcards(
     sourceText: string,
   ): Promise<GenerationFlashcardProposalDto[]> {
+    if (!openRouterService) {
+      throw new GenerationServiceError(
+        "OpenRouter service is not configured. Please set OPENROUTER_API_KEY environment variable.",
+        "AI_GENERATION_FAILED",
+      )
+    }
+
+    const systemMessage = `Jesteś ekspertem w tworzeniu fiszek edukacyjnych. 
+Twoim zadaniem jest analiza dostarczonego tekstu i wygenerowanie zestawu fiszek.
+
+Zasady tworzenia fiszek:
+1. Każda fiszka powinna testować jedną konkretną informację
+2. Pytania (front) powinny być jasne i jednoznaczne (max 200 znaków)
+3. Odpowiedzi (back) powinny być zwięzłe, ale kompletne (max 500 znaków)
+4. Unikaj pytań zbyt ogólnych lub zbyt szczegółowych
+5. Wygeneruj od 3 do 10 fiszek w zależności od ilości materiału
+6. Twórz fiszki w języku tekstu źródłowego
+
+Format odpowiedzi: JSON z tablicą fiszek.`
+
+    const userMessage = `Wygeneruj fiszki edukacyjne na podstawie poniższego tekstu:
+
+${sourceText}`
+
     try {
-      const normalized = sourceText.replace(/\s+/g, " ").trim()
-      const sentences = normalized
-        .split(/(?<=[.!?])\s+/)
-        .map((sentence) => sentence.trim())
-        .filter(Boolean)
-
-      const segments = sentences.length > 0 ? sentences : [normalized]
-      const selected = segments.slice(0, 5)
-
-      if (selected.length === 0) {
-        return [
-          {
-            front: "Summarize the main idea of the text.",
-            back: this.truncateText(normalized, MAX_BACK_LENGTH),
-            source: "ai-full",
-          },
-        ]
-      }
-
-      return selected.map((segment, index) => {
-        const truncatedSegment = this.truncateText(segment, MAX_BACK_LENGTH)
-        const snippet = this.truncateText(segment, MAX_FRONT_LENGTH)
-
-        return {
-          front: `What is the key idea in fragment ${index + 1}? ${snippet}`,
-          back: truncatedSegment,
-          source: "ai-full",
-        }
+      const result = await openRouterService.chatCompletion<FlashcardProposals>({
+        systemMessage,
+        userMessage,
+        responseSchema: {
+          name: "flashcard_proposals",
+          schema: flashcardProposalsSchema,
+        },
+        model: MODEL_NAME,
+        temperature: 0.7,
       })
+
+      return result.flashcards.map((flashcard) => ({
+        front: flashcard.front,
+        back: flashcard.back,
+        source: "ai-full" as const,
+      }))
     } catch (error) {
       throw new GenerationServiceError(
         "Failed to generate flashcard proposals",

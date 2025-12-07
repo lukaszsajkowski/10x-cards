@@ -1,0 +1,62 @@
+---
+import "../styles/global.css";
+import { NavigationShell } from "../components/navigation";
+import { Toaster } from "../components/ui/sonner";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "10x Cards" } = Astro.props;
+
+// Pobierz aktualną ścieżkę do podświetlenia aktywnego linku
+const currentPath = Astro.url.pathname;
+
+// TODO: Po implementacji autoryzacji, pobierz email z sesji
+// const userEmail = Astro.locals.user?.email;
+const userEmail = "user@example.com";
+
+export const prerender = false;
+---
+
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content="10x Cards - Generuj fiszki edukacyjne z pomocą AI" />
+    <title>{title}</title>
+    
+    <!-- Prevent flash of unstyled content for theme -->
+    <script is:inline>
+      (function() {
+        const theme = localStorage.getItem('10x-cards-theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-background text-foreground antialiased">
+    <NavigationShell 
+      client:load 
+      currentPath={currentPath}
+      userEmail={userEmail}
+    >
+      <slot />
+    </NavigationShell>
+    
+    <Toaster client:load position="top-right" />
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+  }
+</style>

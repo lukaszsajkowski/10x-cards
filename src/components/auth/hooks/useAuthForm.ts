@@ -15,6 +15,28 @@ import {
   AUTH_SUCCESS_MESSAGES,
 } from "../types";
 
+/**
+ * Wywołuje API endpoint auth i zwraca wynik
+ */
+async function callAuthApi(
+  endpoint: string,
+  data: Record<string, string>
+): Promise<{ success: boolean; error?: string }> {
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    return { success: false, error: result.error || "Wystąpił błąd" };
+  }
+
+  return { success: true };
+}
+
 // Rozszerzony typ stanu o successMessage
 interface ExtendedAuthFormState extends AuthFormState {
   successMessage: string | null;
@@ -57,7 +79,9 @@ export function useAuthForm(mode: AuthMode): ExtendedAuthFormState & AuthFormAct
     if (requiresPassword) {
       if (!formData.password) {
         result.password = AUTH_ERROR_MESSAGES.PASSWORD_REQUIRED;
-      } else if (formData.password.length < AUTH_VALIDATION.PASSWORD_MIN_LENGTH) {
+      } else if (mode !== "login" && formData.password.length < AUTH_VALIDATION.PASSWORD_MIN_LENGTH) {
+        // Minimalna długość hasła tylko dla rejestracji i zmiany hasła
+        // Przy logowaniu nie walidujemy długości - użytkownik mógł mieć konto z krótszym hasłem
         result.password = AUTH_ERROR_MESSAGES.PASSWORD_TOO_SHORT;
       }
     }
@@ -123,38 +147,43 @@ export function useAuthForm(mode: AuthMode): ExtendedAuthFormState & AuthFormAct
 
       try {
         if (mode === "login") {
-          const { error } = await supabaseClient.auth.signInWithPassword({
+          // Używamy API endpoint aby sesja była zapisana w cookies
+          const result = await callAuthApi("/api/auth/login", {
             email: formData.email,
             password: formData.password,
           });
 
-          if (error) throw error;
+          if (!result.success) {
+            throw new Error(result.error);
+          }
 
           // Przekierowanie po sukcesie logowania
           window.location.href = "/generate";
         } else if (mode === "register") {
-          const { error } = await supabaseClient.auth.signUp({
+          // Używamy API endpoint aby sesja była zapisana w cookies
+          const result = await callAuthApi("/api/auth/register", {
             email: formData.email,
             password: formData.password,
           });
 
-          if (error) throw error;
+          if (!result.success) {
+            throw new Error(result.error);
+          }
 
           // Przekierowanie po sukcesie rejestracji
           window.location.href = "/generate";
         } else if (mode === "reset-password") {
-          const { error } = await supabaseClient.auth.resetPasswordForEmail(
-            formData.email,
-            {
-              redirectTo: `${window.location.origin}/auth/update-password`,
-            }
-          );
+          // Reset hasła nadal używa client-side (wysyła tylko email)
+          const { error } = await supabaseClient.auth.resetPasswordForEmail(formData.email, {
+            redirectTo: `${window.location.origin}/auth/update-password`,
+          });
 
           if (error) throw error;
 
           // Wyświetl komunikat sukcesu
           setSuccessMessage(AUTH_SUCCESS_MESSAGES.RESET_PASSWORD_EMAIL_SENT);
         } else if (mode === "update-password") {
+          // Update password używa client-side (token jest w URL hash)
           const { error } = await supabaseClient.auth.updateUser({
             password: formData.password,
           });
@@ -165,10 +194,7 @@ export function useAuthForm(mode: AuthMode): ExtendedAuthFormState & AuthFormAct
           window.location.href = "/auth/login?message=password-updated";
         }
       } catch (error) {
-        const message =
-          error instanceof Error
-            ? mapSupabaseError(error)
-            : SUPABASE_ERROR_MESSAGES.default;
+        const message = error instanceof Error ? mapSupabaseError(error) : SUPABASE_ERROR_MESSAGES.default;
         setAuthError(message);
       } finally {
         setIsSubmitting(false);

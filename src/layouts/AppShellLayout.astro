@@ -12,9 +12,8 @@ const { title = "10x Cards" } = Astro.props;
 // Pobierz aktualną ścieżkę do podświetlenia aktywnego linku
 const currentPath = Astro.url.pathname;
 
-// TODO: Po implementacji autoryzacji, pobierz email z sesji
-// const userEmail = Astro.locals.user?.email;
-const userEmail = "user@example.com";
+// Pobierz email zalogowanego użytkownika z sesji
+const userEmail = Astro.locals.user?.email ?? "";
 
 export const prerender = false;
 ---

@@ -1,33 +1,32 @@
-import type { APIRoute } from "astro"
+import type { APIRoute } from "astro";
 
-import { DEFAULT_USER_ID } from "../../db/supabase.client"
-import { errorLogListQuerySchema } from "../../lib/generation-error-log.schema"
-import { generationService } from "../../lib/generation.service"
+import { errorLogListQuerySchema } from "../../lib/generation-error-log.schema";
+import { generationService } from "../../lib/generation.service";
 
-export const prerender = false
+export const prerender = false;
 
 const JSON_HEADERS = {
   "content-type": "application/json",
-} as const
+} as const;
 
 function getAdminUserIds(): Set<string> {
-  const raw = (import.meta.env.ADMIN_USER_IDS as string | undefined) ?? ""
+  const raw = (import.meta.env.ADMIN_USER_IDS as string | undefined) ?? "";
   return new Set(
     raw
       .split(",")
       .map((v) => v.trim())
-      .filter(Boolean),
-  )
+      .filter(Boolean)
+  );
 }
 
 export const GET: APIRoute = async ({ url, locals }) => {
-  const supabase = locals.supabase
+  const { supabase, user } = locals;
 
-  if (!supabase) {
-    return new Response(JSON.stringify({ message: "Supabase client not available" }), {
-      status: 500,
+  if (!user) {
+    return new Response(JSON.stringify({ message: "Unauthorized" }), {
+      status: 401,
       headers: JSON_HEADERS,
-    })
+    });
   }
 
   const parsedQuery = errorLogListQuerySchema.safeParse({
@@ -35,7 +34,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
     limit: url.searchParams.get("limit") ?? undefined,
     order: url.searchParams.get("order") ?? undefined,
     user_id: url.searchParams.get("user_id") ?? undefined,
-  })
+  });
 
   if (!parsedQuery.success) {
     return new Response(
@@ -46,22 +45,23 @@ export const GET: APIRoute = async ({ url, locals }) => {
       {
         status: 400,
         headers: JSON_HEADERS,
-      },
-    )
+      }
+    );
   }
 
-  const currentUserId = DEFAULT_USER_ID
-  const adminIds = getAdminUserIds()
-  const isAdmin = adminIds.has(currentUserId)
+  const currentUserId = user.id;
+  const adminIds = getAdminUserIds();
+  const isAdmin = adminIds.has(currentUserId);
 
+  // Tylko admin może przeglądać logi innych użytkowników
   if (parsedQuery.data.user_id && !isAdmin) {
-    return new Response(
-      JSON.stringify({ message: "Forbidden to access another user's logs" }),
-      { status: 403, headers: JSON_HEADERS },
-    )
+    return new Response(JSON.stringify({ message: "Forbidden to access another user's logs" }), {
+      status: 403,
+      headers: JSON_HEADERS,
+    });
   }
 
-  const effectiveUserId = parsedQuery.data.user_id ?? currentUserId
+  const effectiveUserId = parsedQuery.data.user_id ?? currentUserId;
 
   try {
     const result = await generationService.listGenerationErrorLogs({
@@ -70,19 +70,17 @@ export const GET: APIRoute = async ({ url, locals }) => {
       page: parsedQuery.data.page,
       limit: parsedQuery.data.limit,
       order: parsedQuery.data.order,
-    })
+    });
 
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: JSON_HEADERS,
-    })
+    });
   } catch (error) {
-    console.error("Failed to list generation error logs", error)
-    return new Response(
-      JSON.stringify({ message: "Failed to list generation error logs" }),
-      { status: 500, headers: JSON_HEADERS },
-    )
+    console.error("Failed to list generation error logs", error);
+    return new Response(JSON.stringify({ message: "Failed to list generation error logs" }), {
+      status: 500,
+      headers: JSON_HEADERS,
+    });
   }
-}
-
-
+};

@@ -1,8 +1,20 @@
 ---
-import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
----
+/**
+ * Strona główna - przekierowuje na podstawie stanu sesji:
+ * - Zalogowani użytkownicy → /generate
+ * - Niezalogowani → /auth/login
+ *
+ * UWAGA: Middleware również obsługuje to przekierowanie,
+ * ta logika jest dodatkowym zabezpieczeniem.
+ */
 
-<Layout>
-  <Welcome />
-</Layout>
+export const prerender = false;
+
+const user = Astro.locals.user;
+
+if (user) {
+  return Astro.redirect("/generate");
+}
+
+return Astro.redirect("/auth/login");
+---

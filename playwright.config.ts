@@ -1,12 +1,45 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { defineConfig, devices } from "@playwright/test";
 
-/**
- * Read environment variables from .env file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const envFile = process.env.PLAYWRIGHT_ENV_FILE ?? ".env.test";
+const envPath = path.resolve(__dirname, envFile);
+
+if (!fs.existsSync(envPath)) {
+  throw new Error(
+    `Missing Playwright env file at ${envPath}. Provide ${envFile} before running E2E tests.`,
+  );
+}
+
+const parsedEnv = fs
+  .readFileSync(envPath, "utf8")
+  .split("\n")
+  .map((line) => line.trim())
+  .filter((line) => line && !line.startsWith("#"))
+  .reduce<Record<string, string>>((acc, line) => {
+    const delimiterIndex = line.indexOf("=");
+    if (delimiterIndex === -1) {
+      return acc;
+    }
+
+    const key = line.slice(0, delimiterIndex).trim();
+    const value = line.slice(delimiterIndex + 1).trim().replace(/^['"]|['"]$/g, "");
+
+    if (key && !(key in acc)) {
+      acc[key] = value;
+    }
+
+    return acc;
+  }, {});
+
+for (const [key, value] of Object.entries(parsedEnv)) {
+  if (process.env[key] === undefined) {
+    process.env[key] = value;
+  }
+}
 
 /**
  * Playwright configuration for E2E testing.
@@ -15,6 +48,9 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   // Test directory
   testDir: "./e2e",
+
+  // Global teardown to clean Supabase test data after the suite finishes
+  globalTeardown: "./e2e/playwright.teardown.ts",
 
   // Run tests in files in parallel
   fullyParallel: true,

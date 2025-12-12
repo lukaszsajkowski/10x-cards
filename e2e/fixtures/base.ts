@@ -2,6 +2,7 @@ import { test as base } from "@playwright/test";
 import { HomePage } from "../pages/home.page";
 import { LoginPage } from "../pages/login.page";
 import { FlashcardsPage } from "../pages/flashcards.page";
+import { GeneratePage } from "../pages/generate.page";
 
 /**
  * Extended test fixtures with Page Object Model.
@@ -20,6 +21,7 @@ type Fixtures = {
   homePage: HomePage;
   loginPage: LoginPage;
   flashcardsPage: FlashcardsPage;
+  generatePage: GeneratePage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -34,6 +36,10 @@ export const test = base.extend<Fixtures>({
   flashcardsPage: async ({ page }, use) => {
     const flashcardsPage = new FlashcardsPage(page);
     await use(flashcardsPage);
+  },
+  generatePage: async ({ page }, use) => {
+    const generatePage = new GeneratePage(page);
+    await use(generatePage);
   },
 });
 

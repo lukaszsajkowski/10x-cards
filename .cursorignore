@@ -1,0 +1,9 @@
+# environment variables
+.env
+.env.test
+.env.production
+
+**/*.key
+**/*.pem
+**/id_rsa
+

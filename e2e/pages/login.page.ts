@@ -16,8 +16,8 @@ export class LoginPage extends BasePage {
   constructor(page: Parameters<typeof BasePage.prototype.constructor>[0]) {
     super(page);
 
-    // Initialize locators
-    this.emailInput = this.getByRole("textbox", { name: /email/i });
+    // Initialize locators - use more specific selectors
+    this.emailInput = this.page.locator('input[type="email"]');
     this.passwordInput = this.page.locator('input[type="password"]');
     this.submitButton = this.getByRole("button", { name: /zaloguj|login|sign in/i });
     this.errorMessage = this.getByRole("alert");
@@ -33,9 +33,18 @@ export class LoginPage extends BasePage {
    * Fill in the login form and submit.
    */
   async login(email: string, password: string): Promise<void> {
-    await this.emailInput.fill(email);
-    await this.passwordInput.fill(password);
-    await this.submitButton.click();
+    // Use pressSequentially to trigger React onChange for each character
+    await this.emailInput.click();
+    await this.emailInput.clear();
+    await this.emailInput.pressSequentially(email, { delay: 10 });
+
+    await this.passwordInput.click();
+    await this.passwordInput.clear();
+    await this.passwordInput.pressSequentially(password, { delay: 10 });
+
+    // Wait for React state to update and button to become enabled
+    await this.submitButton.waitFor({ state: "visible" });
+    await this.submitButton.click({ timeout: 10000 });
   }
 
   /**
@@ -49,6 +58,7 @@ export class LoginPage extends BasePage {
    * Get the error message text.
    */
   async getErrorText(): Promise<string> {
-    return this.errorMessage.textContent() ?? "";
+    const text = await this.errorMessage.textContent();
+    return text ?? "";
   }
 }

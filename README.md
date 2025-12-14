@@ -57,12 +57,18 @@ To set up and run the project on your local machine, follow these steps.
     ```
 
 3.  **Set up environment variables:**
-    Create a `.env` file in the root of the project and add the following configuration. You will need to add your API keys and configuration details for Supabase and Openrouter.ai.
+    Copy the example environment file and fill in your API keys:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Then edit `.env` and add your configuration:
 
     ```bash
     # .env
-    SUPABASE_URL="your-supabase-url"
-    SUPABASE_ANON_KEY="your-supabase-anon-key"
+    PUBLIC_SUPABASE_URL="your-supabase-url"
+    PUBLIC_SUPABASE_KEY="your-supabase-anon-key"
     OPENROUTER_API_KEY="your-openrouter-api-key"
     ```
 
@@ -78,12 +84,34 @@ To set up and run the project on your local machine, follow these steps.
 
 The following scripts are available in `package.json`:
 
+### Development
+
 -   `npm run dev`: Starts the Astro development server.
 -   `npm run build`: Builds the application for production.
 -   `npm run preview`: Serves the production build locally for preview.
+
+### Code Quality
+
 -   `npm run lint`: Lints the code using ESLint to find and report issues.
 -   `npm run lint:fix`: Automatically fixes fixable ESLint issues.
 -   `npm run format`: Formats code using Prettier.
+
+### Unit & Integration Testing
+
+-   `npm run test`: Runs unit and integration tests with Vitest.
+-   `npm run test:watch`: Runs tests in watch mode.
+-   `npm run test:ui`: Opens Vitest UI for interactive test exploration.
+-   `npm run test:coverage`: Runs tests with code coverage report.
+-   `npm run test:run`: Runs tests once without watch mode.
+
+### End-to-End Testing
+
+-   `npm run e2e`: Runs Playwright E2E tests.
+-   `npm run e2e:ui`: Opens Playwright UI for interactive test execution.
+-   `npm run e2e:headed`: Runs E2E tests in headed browser mode.
+-   `npm run e2e:debug`: Runs E2E tests in debug mode.
+-   `npm run e2e:codegen`: Opens Playwright codegen to record tests.
+-   `npm run e2e:report`: Opens the last Playwright test report.
 
 ## Project Scope
 

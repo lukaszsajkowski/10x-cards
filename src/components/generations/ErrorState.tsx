@@ -15,9 +15,7 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
       </div>
 
       {/* Tekst główny */}
-      <h2 className="text-xl font-semibold mb-2">
-        Nie udało się załadować historii
-      </h2>
+      <h2 className="text-xl font-semibold mb-2">Nie udało się załadować historii</h2>
 
       {/* Komunikat błędu */}
       <p className="text-muted-foreground mb-8 max-w-md">{error}</p>

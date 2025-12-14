@@ -33,18 +33,19 @@ export class LoginPage extends BasePage {
    * Fill in the login form and submit.
    */
   async login(email: string, password: string): Promise<void> {
-    // Use pressSequentially to trigger React onChange for each character
+    // Fill email field - use click + clear + pressSequentially to ensure React state updates
     await this.emailInput.click();
-    await this.emailInput.clear();
-    await this.emailInput.pressSequentially(email, { delay: 10 });
+    await this.emailInput.fill("");
+    await this.emailInput.pressSequentially(email, { delay: 20 });
 
+    // Fill password field
     await this.passwordInput.click();
-    await this.passwordInput.clear();
-    await this.passwordInput.pressSequentially(password, { delay: 10 });
+    await this.passwordInput.fill("");
+    await this.passwordInput.pressSequentially(password, { delay: 20 });
 
     // Wait for React state to update and button to become enabled
-    await this.submitButton.waitFor({ state: "visible" });
-    await this.submitButton.click({ timeout: 10000 });
+    await this.page.waitForTimeout(100);
+    await this.submitButton.click();
   }
 
   /**

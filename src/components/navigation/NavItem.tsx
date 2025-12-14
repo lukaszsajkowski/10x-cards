@@ -35,30 +35,12 @@ export const NavItem = memo(function NavItem({
           // Wariant bottom-nav (mobile)
           isBottomNav && [
             "flex-col items-center justify-center gap-1 px-2 py-1.5 min-w-[64px]",
-            isActive
-              ? "text-primary"
-              : "text-muted-foreground hover:text-foreground",
+            isActive ? "text-primary" : "text-muted-foreground hover:text-foreground",
           ]
         )}
       >
-        <Icon
-          className={cn(
-            "shrink-0",
-            isSidebar && "h-5 w-5",
-            isBottomNav && "h-5 w-5"
-          )}
-          aria-hidden="true"
-        />
-        {showLabel && (
-          <span
-            className={cn(
-              isBottomNav && "text-xs",
-              isSidebar && "truncate"
-            )}
-          >
-            {label}
-          </span>
-        )}
+        <Icon className={cn("shrink-0", isSidebar && "h-5 w-5", isBottomNav && "h-5 w-5")} aria-hidden="true" />
+        {showLabel && <span className={cn(isBottomNav && "text-xs", isSidebar && "truncate")}>{label}</span>}
       </a>
     </li>
   );

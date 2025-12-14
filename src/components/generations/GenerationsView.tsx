@@ -13,18 +13,8 @@ import { ErrorState } from "./ErrorState";
  * koordynuje wyświetlanie stanów ładowania, błędów i pustej listy.
  */
 export function GenerationsView() {
-  const {
-    generations,
-    pagination,
-    sortOrder,
-    isLoading,
-    error,
-    setPage,
-    setLimit,
-    setSortOrder,
-    refresh,
-    clearError,
-  } = useGenerations();
+  const { generations, pagination, sortOrder, isLoading, error, setPage, setLimit, setSortOrder, refresh, clearError } =
+    useGenerations();
 
   // Handler ponowienia próby po błędzie
   const handleRetry = useCallback(() => {
@@ -67,11 +57,7 @@ export function GenerationsView() {
     <>
       <GenerationsHeader />
 
-      <GenerationsTable
-        generations={generations}
-        sortOrder={sortOrder}
-        onSortOrderChange={setSortOrder}
-      />
+      <GenerationsTable generations={generations} sortOrder={sortOrder} onSortOrderChange={setSortOrder} />
 
       <Pagination
         page={pagination.page}

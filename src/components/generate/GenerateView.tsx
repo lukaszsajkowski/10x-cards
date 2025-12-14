@@ -75,23 +75,14 @@ export function GenerateView() {
       <div className="space-y-6">
         <Alert className="border-green-500 bg-green-50 dark:bg-green-950/20">
           <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertTitle className="text-green-800 dark:text-green-200">
-            Fiszki zapisane pomyślnie!
-          </AlertTitle>
+          <AlertTitle className="text-green-800 dark:text-green-200">Fiszki zapisane pomyślnie!</AlertTitle>
           <AlertDescription className="text-green-700 dark:text-green-300">
             Zapisano {viewState.savedCount}{" "}
-            {viewState.savedCount === 1
-              ? "fiszkę"
-              : viewState.savedCount < 5
-                ? "fiszki"
-                : "fiszek"}{" "}
-            do Twojej kolekcji.
+            {viewState.savedCount === 1 ? "fiszkę" : viewState.savedCount < 5 ? "fiszki" : "fiszek"} do Twojej kolekcji.
           </AlertDescription>
         </Alert>
         <div className="flex justify-center">
-          <Button onClick={handleNewGeneration}>
-            Wygeneruj kolejne fiszki
-          </Button>
+          <Button onClick={handleNewGeneration}>Wygeneruj kolejne fiszki</Button>
         </div>
       </div>
     );
@@ -117,21 +108,20 @@ export function GenerateView() {
       {viewState.status === "generating" && <GenerationLoader skeletonCount={4} />}
 
       {/* Sekcja recenzji propozycji */}
-      {(viewState.status === "review" || viewState.status === "saving") &&
-        generationId && (
-          <ReviewSection
-            sourceText={sourceText}
-            proposals={proposals}
-            generationId={generationId}
-            onProposalUpdate={updateProposal}
-            onProposalAccept={acceptProposal}
-            onProposalReject={rejectProposal}
-            onSaveAccepted={saveAcceptedFlashcards}
-            onRejectAll={rejectAllProposals}
-            isSaving={isSaving}
-            acceptedCount={acceptedCount}
-          />
-        )}
+      {(viewState.status === "review" || viewState.status === "saving") && generationId && (
+        <ReviewSection
+          sourceText={sourceText}
+          proposals={proposals}
+          generationId={generationId}
+          onProposalUpdate={updateProposal}
+          onProposalAccept={acceptProposal}
+          onProposalReject={rejectProposal}
+          onSaveAccepted={saveAcceptedFlashcards}
+          onRejectAll={rejectAllProposals}
+          isSaving={isSaving}
+          acceptedCount={acceptedCount}
+        />
+      )}
     </div>
   );
 }

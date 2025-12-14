@@ -27,26 +27,22 @@ export const prerender = false;
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content="10x Cards - Generuj fiszki edukacyjne z pomocą AI" />
     <title>{title}</title>
-    
+
     <!-- Prevent flash of unstyled content for theme -->
     <script is:inline>
-      (function() {
-        const theme = localStorage.getItem('10x-cards-theme');
-        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark');
+      (function () {
+        const theme = localStorage.getItem("10x-cards-theme");
+        if (theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+          document.documentElement.classList.add("dark");
         }
       })();
     </script>
   </head>
   <body class="min-h-screen bg-background text-foreground antialiased">
-    <NavigationShell 
-      client:load 
-      currentPath={currentPath}
-      userEmail={userEmail}
-    >
+    <NavigationShell client:load currentPath={currentPath} userEmail={userEmail}>
       <slot />
     </NavigationShell>
-    
+
     <Toaster client:load position="top-right" />
   </body>
 </html>

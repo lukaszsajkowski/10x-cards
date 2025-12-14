@@ -1,11 +1,6 @@
 import { test, expect } from "./fixtures/base";
 import { GeneratePage, VALIDATION_LIMITS } from "./pages/generate.page";
-import {
-  TEST_DATA,
-  VALIDATION_MESSAGES,
-  TIMEOUTS,
-  TEST_USERS,
-} from "./helpers/test-data";
+import { TEST_DATA, TIMEOUTS } from "./helpers/test-data";
 import { loginViaUI } from "./helpers/auth.helper";
 
 /**
@@ -26,19 +21,14 @@ test.describe("AI Flashcard Generation", () => {
   // =========================================================
 
   test.describe("Authentication", () => {
-    test("should redirect to login when accessing /generate without authentication", async ({
-      generatePage,
-      page,
-    }) => {
+    test("should redirect to login when accessing /generate without authentication", async ({ generatePage, page }) => {
       await generatePage.goto();
 
       // Should be redirected to login
       await expect(page).toHaveURL(/\/auth\/login/);
     });
 
-    test("should allow access to /generate when authenticated", async ({
-      page,
-    }) => {
+    test("should allow access to /generate when authenticated", async ({ page }) => {
       // Login first
       await loginViaUI(page);
 
@@ -64,9 +54,7 @@ test.describe("AI Flashcard Generation", () => {
       await page.goto("/generate");
     });
 
-    test("should show character counter with correct initial state", async ({
-      page,
-    }) => {
+    test("should show character counter with correct initial state", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -90,9 +78,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(count.current).toBe(testText.length);
     });
 
-    test("should disable generate button when text is too short", async ({
-      page,
-    }) => {
+    test("should disable generate button when text is too short", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -104,9 +90,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(isEnabled).toBe(false);
     });
 
-    test("should disable generate button when text is empty", async ({
-      page,
-    }) => {
+    test("should disable generate button when text is empty", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -118,9 +102,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(isEnabled).toBe(false);
     });
 
-    test("should enable generate button when text meets minimum length", async ({
-      page,
-    }) => {
+    test("should enable generate button when text meets minimum length", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -132,9 +114,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(isEnabled).toBe(true);
     });
 
-    test("should enable generate button for maximum length text", async ({
-      page,
-    }) => {
+    test("should enable generate button for maximum length text", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -150,9 +130,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(count.current).toBe(VALIDATION_LIMITS.SOURCE_TEXT_MAX);
     });
 
-    test("should show validation error for text below minimum", async ({
-      page,
-    }) => {
+    test("should show validation error for text below minimum", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -165,9 +143,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(count.current).toBeLessThan(VALIDATION_LIMITS.SOURCE_TEXT_MIN);
     });
 
-    test("should handle text with special characters and Polish diacritics", async ({
-      page,
-    }) => {
+    test("should handle text with special characters and Polish diacritics", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -193,9 +169,7 @@ test.describe("AI Flashcard Generation", () => {
       await page.goto("/generate");
     });
 
-    test("should display proposals after successful generation", async ({
-      page,
-    }) => {
+    test("should display proposals after successful generation", async ({ page }) => {
       test.setTimeout(TIMEOUTS.AI_GENERATION + 30000); // Extended timeout for AI
 
       const generatePage = new GeneratePage(page);
@@ -424,9 +398,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(acceptedCount).toBe(proposalCount);
     });
 
-    test("should update accepted count when rejecting proposals", async ({
-      page,
-    }) => {
+    test("should update accepted count when rejecting proposals", async ({ page }) => {
       const generatePage = new GeneratePage(page);
 
       const initialCount = await generatePage.getAcceptedCount();
@@ -438,9 +410,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(newCount).toBe(initialCount - 1);
     });
 
-    test("should disable save button when no proposals are accepted", async ({
-      page,
-    }) => {
+    test("should disable save button when no proposals are accepted", async ({ page }) => {
       const generatePage = new GeneratePage(page);
 
       const proposalCount = await generatePage.getProposalCount();
@@ -455,9 +425,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(isEnabled).toBe(false);
     });
 
-    test("should reject all proposals and return to input form", async ({
-      page,
-    }) => {
+    test("should reject all proposals and return to input form", async ({ page }) => {
       const generatePage = new GeneratePage(page);
 
       // Click "Reject All"
@@ -487,9 +455,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(savedCount).toBe(acceptedCount);
     });
 
-    test("should allow starting new generation after success", async ({
-      page,
-    }) => {
+    test("should allow starting new generation after success", async ({ page }) => {
       const generatePage = new GeneratePage(page);
 
       // Save flashcards
@@ -515,9 +481,7 @@ test.describe("AI Flashcard Generation", () => {
       await page.goto("/generate");
     });
 
-    test("should display error alert on generation failure", async ({
-      page,
-    }) => {
+    test("should display error alert on generation failure", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -538,9 +502,7 @@ test.describe("AI Flashcard Generation", () => {
       await expect(generatePage.errorAlert).toBeVisible({ timeout: 10000 });
     });
 
-    test("should allow dismissing error and returning to input", async ({
-      page,
-    }) => {
+    test("should allow dismissing error and returning to input", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -615,9 +577,7 @@ test.describe("AI Flashcard Generation", () => {
       expect(count.current).toBe(testText.length);
     });
 
-    test("should clear localStorage after successful save", async ({
-      page,
-    }) => {
+    test("should clear localStorage after successful save", async ({ page }) => {
       test.setTimeout(TIMEOUTS.AI_GENERATION + 30000);
 
       const generatePage = new GeneratePage(page);
@@ -673,9 +633,7 @@ test.describe("AI Flashcard Generation", () => {
       await expect(generatePage.characterCounter).toBeVisible();
     });
 
-    test("should show bulk actions bar properly on mobile after generation", async ({
-      page,
-    }) => {
+    test("should show bulk actions bar properly on mobile after generation", async ({ page }) => {
       test.setTimeout(TIMEOUTS.AI_GENERATION + 30000);
 
       await page.setViewportSize({ width: 375, height: 667 });
@@ -708,9 +666,7 @@ test.describe("AI Flashcard Generation", () => {
       await page.goto("/generate");
     });
 
-    test("should have proper ARIA labels on interactive elements", async ({
-      page,
-    }) => {
+    test("should have proper ARIA labels on interactive elements", async ({ page }) => {
       const generatePage = new GeneratePage(page);
       await generatePage.waitForReady();
 
@@ -733,9 +689,7 @@ test.describe("AI Flashcard Generation", () => {
       // The validation error has role="alert" which is announced to screen readers
     });
 
-    test("should have proper heading structure in review mode", async ({
-      page,
-    }) => {
+    test("should have proper heading structure in review mode", async ({ page }) => {
       test.setTimeout(TIMEOUTS.AI_GENERATION + 30000);
 
       const generatePage = new GeneratePage(page);

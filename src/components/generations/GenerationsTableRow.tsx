@@ -26,23 +26,13 @@ function formatNumber(num: number): string {
  * Pojedynczy wiersz tabeli reprezentujący jedną generację.
  * Wyświetla wszystkie dane generacji w czytelnym formacie.
  */
-export const GenerationsTableRow = memo(function GenerationsTableRow({
-  generation,
-}: GenerationsTableRowProps) {
+export const GenerationsTableRow = memo(function GenerationsTableRow({ generation }: GenerationsTableRowProps) {
   return (
     <TableRow>
-      <TableCell className="font-medium">
-        {formatDate(generation.createdAt)}
-      </TableCell>
-      <TableCell className="text-right tabular-nums">
-        {formatNumber(generation.sourceTextLength)} zn.
-      </TableCell>
-      <TableCell className="text-right tabular-nums">
-        {generation.generatedCount}
-      </TableCell>
-      <TableCell className="text-right tabular-nums">
-        {generation.totalAcceptedCount}
-      </TableCell>
+      <TableCell className="font-medium">{formatDate(generation.createdAt)}</TableCell>
+      <TableCell className="text-right tabular-nums">{formatNumber(generation.sourceTextLength)} zn.</TableCell>
+      <TableCell className="text-right tabular-nums">{generation.generatedCount}</TableCell>
+      <TableCell className="text-right tabular-nums">{generation.totalAcceptedCount}</TableCell>
       <TableCell className="text-right tabular-nums">
         <span
           className={

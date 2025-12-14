@@ -1,62 +1,60 @@
-import { createHash } from "node:crypto"
+import { createHash } from "node:crypto";
 
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SupabaseClient } from "../db/supabase.client"
+import type { SupabaseClient } from "../db/supabase.client";
 import type {
   CreateGenerationResponseDto,
   GenerationFlashcardProposalDto,
   GenerationListResponseDto,
   GenerationDetailDto,
   GenerationErrorLogListResponseDto,
-} from "../types"
-import { openRouterService } from "./openrouter.service"
+} from "../types";
+import { openRouterService } from "./openrouter.service";
 
-export type CreateGenerationParams = {
-  supabase: SupabaseClient
-  userId: string
-  sourceText: string
+export interface CreateGenerationParams {
+  supabase: SupabaseClient;
+  userId: string;
+  sourceText: string;
 }
 
-export type ListGenerationsParams = {
-  supabase: SupabaseClient
-  userId: string
-  page: number
-  limit: number
-  order: "asc" | "desc"
+export interface ListGenerationsParams {
+  supabase: SupabaseClient;
+  userId: string;
+  page: number;
+  limit: number;
+  order: "asc" | "desc";
 }
 
-export type GetGenerationDetailParams = {
-  supabase: SupabaseClient
-  userId: string
-  generationId: string
+export interface GetGenerationDetailParams {
+  supabase: SupabaseClient;
+  userId: string;
+  generationId: string;
 }
 
-export type ListGenerationErrorLogsParams = {
-  supabase: SupabaseClient
-  userId: string
-  page: number
-  limit: number
-  order: "asc" | "desc"
+export interface ListGenerationErrorLogsParams {
+  supabase: SupabaseClient;
+  userId: string;
+  page: number;
+  limit: number;
+  order: "asc" | "desc";
 }
 
-export type GenerationServiceErrorCode =
-  | "AI_GENERATION_FAILED"
-  | "GENERATION_PERSISTENCE_FAILED"
+export type GenerationServiceErrorCode = "AI_GENERATION_FAILED" | "GENERATION_PERSISTENCE_FAILED";
 
 export class GenerationServiceError extends Error {
   constructor(
     message: string,
     public readonly code: GenerationServiceErrorCode,
-    public readonly cause?: unknown,
+    public readonly cause?: unknown
   ) {
-    super(message)
-    this.name = "GenerationServiceError"
+    super(message);
+    this.name = "GenerationServiceError";
   }
 }
 
-const MODEL_NAME = "openai/gpt-4o-mini"
-const MAX_ERROR_MESSAGE_LENGTH = 500
+const MODEL_NAME = "openai/gpt-4o-mini";
+const MAX_ERROR_MESSAGE_LENGTH = 500;
 
 // Zod schema for AI response validation
 const flashcardProposalsSchema = z.object({
@@ -65,27 +63,24 @@ const flashcardProposalsSchema = z.object({
       z.object({
         front: z.string().min(1).max(200),
         back: z.string().min(1).max(500),
-      }),
+      })
     )
     .min(1)
     .max(10),
-})
+});
 
-type FlashcardProposals = z.infer<typeof flashcardProposalsSchema>
+type FlashcardProposals = z.infer<typeof flashcardProposalsSchema>;
 
 export class GenerationService {
-  async createGeneration(
-    params: CreateGenerationParams,
-  ): Promise<CreateGenerationResponseDto> {
-    const { supabase, userId, sourceText } = params
+  async createGeneration(params: CreateGenerationParams): Promise<CreateGenerationResponseDto> {
+    const { supabase, userId, sourceText } = params;
 
-    let proposals: GenerationFlashcardProposalDto[]
+    let proposals: GenerationFlashcardProposalDto[];
 
     try {
-      proposals = await this.generateFlashcards(sourceText)
+      proposals = await this.generateFlashcards(sourceText);
     } catch (error) {
-      const serviceError =
-        error instanceof GenerationServiceError ? error : undefined
+      const serviceError = error instanceof GenerationServiceError ? error : undefined;
 
       await this.logGenerationError({
         supabase,
@@ -93,14 +88,12 @@ export class GenerationService {
         sourceText,
         error,
         errorCode: serviceError?.code ?? "AI_GENERATION_FAILED",
-      })
+      });
 
-      throw serviceError ??
-        new GenerationServiceError(
-          "Failed to generate flashcard proposals",
-          "AI_GENERATION_FAILED",
-          error,
-        )
+      throw (
+        serviceError ??
+        new GenerationServiceError("Failed to generate flashcard proposals", "AI_GENERATION_FAILED", error)
+      );
     }
 
     const { data, error } = await supabase
@@ -111,7 +104,7 @@ export class GenerationService {
         generated_count: proposals.length,
       })
       .select("id, generated_count")
-      .single()
+      .single();
 
     if (error || !data) {
       await this.logGenerationError({
@@ -120,42 +113,36 @@ export class GenerationService {
         sourceText,
         error: error ?? new Error("Generation insert returned empty data"),
         errorCode: "GENERATION_PERSISTENCE_FAILED",
-      })
+      });
 
-      throw new GenerationServiceError(
-        "Failed to persist generation metadata",
-        "GENERATION_PERSISTENCE_FAILED",
-        error,
-      )
+      throw new GenerationServiceError("Failed to persist generation metadata", "GENERATION_PERSISTENCE_FAILED", error);
     }
 
     return {
       generation_id: data.id,
       flashcards_proposals: proposals,
       generated_count: data.generated_count,
-    }
+    };
   }
 
-  async listGenerations(
-    params: ListGenerationsParams,
-  ): Promise<GenerationListResponseDto> {
-    const { supabase, userId, page, limit, order } = params
+  async listGenerations(params: ListGenerationsParams): Promise<GenerationListResponseDto> {
+    const { supabase, userId, page, limit, order } = params;
 
-    const offset = (page - 1) * limit
-    const ascending = order === "asc"
+    const offset = (page - 1) * limit;
+    const ascending = order === "asc";
 
     const { data, error, count } = await supabase
       .from("generations")
       .select(
         "id, generated_count, accepted_edited_count, accepted_unedited_count, source_text_length, created_at, updated_at",
-        { count: "exact" },
+        { count: "exact" }
       )
       .eq("user_id", userId)
       .order("created_at", { ascending })
-      .range(offset, offset + limit - 1)
+      .range(offset, offset + limit - 1);
 
     if (error || !data || typeof count !== "number") {
-      throw new Error("Failed to list generations")
+      throw new Error("Failed to list generations");
     }
 
     return {
@@ -173,29 +160,26 @@ export class GenerationService {
         limit,
         total: count,
       },
-    }
+    };
   }
 
-  async listGenerationErrorLogs(
-    params: ListGenerationErrorLogsParams,
-  ): Promise<GenerationErrorLogListResponseDto> {
-    const { supabase, userId, page, limit, order } = params
+  async listGenerationErrorLogs(params: ListGenerationErrorLogsParams): Promise<GenerationErrorLogListResponseDto> {
+    const { supabase, userId, page, limit, order } = params;
 
-    const offset = (page - 1) * limit
-    const ascending = order === "asc"
+    const offset = (page - 1) * limit;
+    const ascending = order === "asc";
 
     const { data, error, count } = await supabase
       .from("generation_error_logs")
-      .select(
-        "id, model, source_text_hash, source_text_length, error_code, error_message, created_at",
-        { count: "exact" },
-      )
+      .select("id, model, source_text_hash, source_text_length, error_code, error_message, created_at", {
+        count: "exact",
+      })
       .eq("user_id", userId)
       .order("created_at", { ascending })
-      .range(offset, offset + limit - 1)
+      .range(offset, offset + limit - 1);
 
     if (error || !data || typeof count !== "number") {
-      throw new Error("Failed to list generation error logs")
+      throw new Error("Failed to list generation error logs");
     }
 
     return {
@@ -213,45 +197,38 @@ export class GenerationService {
         limit,
         total: count,
       },
-    }
+    };
   }
 
-  async getGenerationDetail(
-    params: GetGenerationDetailParams,
-  ): Promise<GenerationDetailDto | null> {
-    const { supabase, userId, generationId } = params
+  async getGenerationDetail(params: GetGenerationDetailParams): Promise<GenerationDetailDto | null> {
+    const { supabase, userId, generationId } = params;
 
     const { data: generationRow, error: generationError } = await supabase
       .from("generations")
       .select(
-        "id, source_text, source_text_length, generated_count, accepted_edited_count, accepted_unedited_count, created_at, updated_at",
+        "id, source_text, source_text_length, generated_count, accepted_edited_count, accepted_unedited_count, created_at, updated_at"
       )
       .eq("id", generationId)
       .eq("user_id", userId)
-      .maybeSingle()
+      .maybeSingle();
 
     if (generationError) {
-      throw new Error("Failed to fetch generation")
+      throw new Error("Failed to fetch generation");
     }
 
     if (!generationRow) {
-      return null
+      return null;
     }
 
-    const {
-      data: flashcardsData,
-      error: flashcardsError,
-    } = await supabase
+    const { data: flashcardsData, error: flashcardsError } = await supabase
       .from("flashcards")
-      .select(
-        "id, front, back, source, created_at, updated_at, generation_id",
-      )
+      .select("id, front, back, source, created_at, updated_at, generation_id")
       .eq("generation_id", generationId)
       .eq("user_id", userId)
-      .order("created_at", { ascending: true })
+      .order("created_at", { ascending: true });
 
     if (flashcardsError || !flashcardsData) {
-      throw new Error("Failed to fetch flashcards")
+      throw new Error("Failed to fetch flashcards");
     }
 
     return {
@@ -272,17 +249,15 @@ export class GenerationService {
         updated_at: row.updated_at,
         generation_id: row.generation_id,
       })),
-    }
+    };
   }
 
-  private async generateFlashcards(
-    sourceText: string,
-  ): Promise<GenerationFlashcardProposalDto[]> {
+  private async generateFlashcards(sourceText: string): Promise<GenerationFlashcardProposalDto[]> {
     if (!openRouterService) {
       throw new GenerationServiceError(
         "OpenRouter service is not configured. Please set OPENROUTER_API_KEY environment variable.",
-        "AI_GENERATION_FAILED",
-      )
+        "AI_GENERATION_FAILED"
+      );
     }
 
     const systemMessage = `Jesteś ekspertem w tworzeniu fiszek edukacyjnych. 
@@ -296,11 +271,11 @@ Zasady tworzenia fiszek:
 5. Wygeneruj od 3 do 10 fiszek w zależności od ilości materiału
 6. Twórz fiszki w języku tekstu źródłowego
 
-Format odpowiedzi: JSON z tablicą fiszek.`
+Format odpowiedzi: JSON z tablicą fiszek.`;
 
     const userMessage = `Wygeneruj fiszki edukacyjne na podstawie poniższego tekstu:
 
-${sourceText}`
+${sourceText}`;
 
     try {
       const result = await openRouterService.chatCompletion<FlashcardProposals>({
@@ -312,35 +287,28 @@ ${sourceText}`
         },
         model: MODEL_NAME,
         temperature: 0.7,
-      })
+      });
 
       return result.flashcards.map((flashcard) => ({
         front: flashcard.front,
         back: flashcard.back,
         source: "ai-full" as const,
-      }))
+      }));
     } catch (error) {
-      throw new GenerationServiceError(
-        "Failed to generate flashcard proposals",
-        "AI_GENERATION_FAILED",
-        error,
-      )
+      throw new GenerationServiceError("Failed to generate flashcard proposals", "AI_GENERATION_FAILED", error);
     }
   }
 
   private async logGenerationError(params: {
-    supabase: SupabaseClient
-    userId: string
-    sourceText: string
-    error: unknown
-    errorCode: GenerationServiceErrorCode
+    supabase: SupabaseClient;
+    userId: string;
+    sourceText: string;
+    error: unknown;
+    errorCode: GenerationServiceErrorCode;
   }) {
-    const { supabase, userId, sourceText, error, errorCode } = params
+    const { supabase, userId, sourceText, error, errorCode } = params;
 
-    const errorMessage = this.truncateText(
-      this.extractErrorMessage(error),
-      MAX_ERROR_MESSAGE_LENGTH,
-    )
+    const errorMessage = this.truncateText(this.extractErrorMessage(error), MAX_ERROR_MESSAGE_LENGTH);
 
     const insertResult = await supabase.from("generation_error_logs").insert({
       user_id: userId,
@@ -349,44 +317,40 @@ ${sourceText}`
       model: MODEL_NAME,
       source_text_hash: this.computeSourceTextHash(sourceText),
       source_text_length: sourceText.length,
-    })
+    });
 
     if (insertResult.error) {
-      console.error(
-        "Failed to insert generation error log",
-        insertResult.error.message,
-      )
+      console.error("Failed to insert generation error log", insertResult.error.message);
     }
   }
 
   private extractErrorMessage(error: unknown): string {
     if (error instanceof GenerationServiceError && error.cause) {
-      return this.extractErrorMessage(error.cause)
+      return this.extractErrorMessage(error.cause);
     }
 
     if (error instanceof Error) {
-      return error.message
+      return error.message;
     }
 
     if (typeof error === "string") {
-      return error
+      return error;
     }
 
-    return "Unknown error"
+    return "Unknown error";
   }
 
   private computeSourceTextHash(sourceText: string): string {
-    return createHash("md5").update(sourceText).digest("hex")
+    return createHash("md5").update(sourceText).digest("hex");
   }
 
   private truncateText(value: string, maxLength: number): string {
     if (value.length <= maxLength) {
-      return value
+      return value;
     }
 
-    return `${value.slice(0, maxLength - 3)}...`
+    return `${value.slice(0, maxLength - 3)}...`;
   }
 }
 
-export const generationService = new GenerationService()
-
+export const generationService = new GenerationService();

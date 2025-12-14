@@ -35,10 +35,7 @@ export function SourceTextInput({
         onChange={handleChange}
         disabled={disabled}
         placeholder={placeholder}
-        className={cn(
-          "min-h-[200px] resize-y",
-          hasError && "border-destructive focus-visible:ring-destructive"
-        )}
+        className={cn("min-h-[200px] resize-y", hasError && "border-destructive focus-visible:ring-destructive")}
         aria-invalid={hasError}
         aria-describedby={hasError ? errorId : undefined}
       />

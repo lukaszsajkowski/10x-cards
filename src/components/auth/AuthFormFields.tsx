@@ -1,12 +1,7 @@
 import { useId, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "./PasswordInput";
-import type {
-  AuthMode,
-  AuthFormData,
-  AuthFormValidationErrors,
-  AuthFormTouched,
-} from "./types";
+import type { AuthMode, AuthFormData, AuthFormValidationErrors, AuthFormTouched } from "./types";
 
 interface AuthFormFieldsProps {
   mode: AuthMode;
@@ -77,8 +72,7 @@ export function AuthFormFields({
 
   const showEmailError = touched.email && errors.email;
   const showPasswordError = touched.password && errors.password;
-  const showConfirmPasswordError =
-    touched.confirmPassword && errors.confirmPassword;
+  const showConfirmPasswordError = touched.confirmPassword && errors.confirmPassword;
 
   const fieldConfig = FIELD_CONFIG[mode];
 
@@ -171,9 +165,7 @@ export function AuthFormFields({
             disabled={isSubmitting}
             autoComplete="new-password"
             aria-invalid={showConfirmPasswordError ? "true" : undefined}
-            aria-describedby={
-              showConfirmPasswordError ? confirmPasswordErrorId : undefined
-            }
+            aria-describedby={showConfirmPasswordError ? confirmPasswordErrorId : undefined}
           />
           {showConfirmPasswordError && (
             <p id={confirmPasswordErrorId} className="text-sm text-destructive">

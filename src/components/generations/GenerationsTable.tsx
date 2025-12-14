@@ -1,12 +1,6 @@
 import { useCallback } from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { GenerationsTableRow } from "./GenerationsTableRow";
 import type { GenerationsTableProps } from "./types";
@@ -15,17 +9,12 @@ import type { GenerationsTableProps } from "./types";
  * Tabela prezentująca listę generacji.
  * Wykorzystuje komponenty Shadcn/ui Table dla spójnego wyglądu i dostępności.
  */
-export function GenerationsTable({
-  generations,
-  sortOrder,
-  onSortOrderChange,
-}: GenerationsTableProps) {
+export function GenerationsTable({ generations, sortOrder, onSortOrderChange }: GenerationsTableProps) {
   const handleSortClick = useCallback(() => {
     onSortOrderChange(sortOrder === "desc" ? "asc" : "desc");
   }, [sortOrder, onSortOrderChange]);
 
-  const SortIcon =
-    sortOrder === "desc" ? ArrowDown : sortOrder === "asc" ? ArrowUp : ArrowUpDown;
+  const SortIcon = sortOrder === "desc" ? ArrowDown : sortOrder === "asc" ? ArrowUp : ArrowUpDown;
 
   return (
     <div className="rounded-md border">

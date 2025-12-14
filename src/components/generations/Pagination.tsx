@@ -1,13 +1,7 @@
 import { useCallback, useId } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { PaginationProps } from "./types";
 
 const LIMIT_OPTIONS = [10, 20, 50] as const;
@@ -17,14 +11,7 @@ const LIMIT_OPTIONS = [10, 20, 50] as const;
  * Wyświetla informację o aktualnej stronie, przyciski nawigacyjne
  * oraz opcję zmiany liczby elementów na stronie.
  */
-export function Pagination({
-  page,
-  limit,
-  total,
-  onPageChange,
-  onLimitChange,
-  isLoading = false,
-}: PaginationProps) {
+export function Pagination({ page, limit, total, onPageChange, onLimitChange, isLoading = false }: PaginationProps) {
   const selectId = useId();
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
@@ -62,17 +49,10 @@ export function Pagination({
       <div className="flex items-center gap-4 order-1 sm:order-2">
         {/* Wybór liczby elementów */}
         <div className="flex items-center gap-2">
-          <label
-            htmlFor={selectId}
-            className="text-sm text-muted-foreground whitespace-nowrap"
-          >
+          <label htmlFor={selectId} className="text-sm text-muted-foreground whitespace-nowrap">
             Na stronie:
           </label>
-          <Select
-            value={limit.toString()}
-            onValueChange={handleLimitChange}
-            disabled={isLoading}
-          >
+          <Select value={limit.toString()} onValueChange={handleLimitChange} disabled={isLoading}>
             <SelectTrigger id={selectId} className="w-[70px]" size="sm">
               <SelectValue />
             </SelectTrigger>

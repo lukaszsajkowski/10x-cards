@@ -1,10 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import type { GenerationListResponseDto } from "@/types";
-import type {
-  GenerationListItemViewModel,
-  PaginationState,
-  UseGenerationsReturn,
-} from "../types";
+import type { GenerationListItemViewModel, PaginationState, UseGenerationsReturn } from "../types";
 import { mapGenerationDtoToViewModel } from "../types";
 
 const DEFAULT_LIMIT = 20;
@@ -16,9 +12,7 @@ const ALLOWED_LIMITS = [10, 20, 50] as const;
  */
 export function useGenerations(): UseGenerationsReturn {
   // Stan listy
-  const [generations, setGenerations] = useState<GenerationListItemViewModel[]>(
-    []
-  );
+  const [generations, setGenerations] = useState<GenerationListItemViewModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,9 +49,7 @@ export function useGenerations(): UseGenerationsReturn {
 
         if (response.status === 400) {
           const errorData = await response.json().catch(() => ({}));
-          setError(
-            errorData.message || "Nieprawidłowe parametry zapytania."
-          );
+          setError(errorData.message || "Nieprawidłowe parametry zapytania.");
           return;
         }
 
@@ -102,9 +94,7 @@ export function useGenerations(): UseGenerationsReturn {
 
   // Zmiana limitu z resetowaniem strony
   const setLimit = useCallback((newLimit: number) => {
-    const validLimit = ALLOWED_LIMITS.includes(newLimit as typeof ALLOWED_LIMITS[number])
-      ? newLimit
-      : DEFAULT_LIMIT;
+    const validLimit = ALLOWED_LIMITS.includes(newLimit as (typeof ALLOWED_LIMITS)[number]) ? newLimit : DEFAULT_LIMIT;
     setLimitState(validLimit);
     setPageState(1); // Reset do pierwszej strony
   }, []);

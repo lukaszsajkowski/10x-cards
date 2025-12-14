@@ -75,17 +75,12 @@ export interface GenerationsQueryParams {
 /**
  * Mapuje GenerationSummaryDto na GenerationListItemViewModel
  */
-export function mapGenerationDtoToViewModel(
-  dto: GenerationSummaryDto
-): GenerationListItemViewModel {
+export function mapGenerationDtoToViewModel(dto: GenerationSummaryDto): GenerationListItemViewModel {
   const acceptedEditedCount = dto.accepted_edited_count ?? 0;
   const acceptedUneditedCount = dto.accepted_unedited_count ?? 0;
   const totalAcceptedCount = acceptedEditedCount + acceptedUneditedCount;
   const generatedCount = dto.generated_count ?? 0;
-  const acceptanceRate =
-    generatedCount > 0
-      ? Math.round((totalAcceptedCount / generatedCount) * 100)
-      : 0;
+  const acceptanceRate = generatedCount > 0 ? Math.round((totalAcceptedCount / generatedCount) * 100) : 0;
 
   return {
     id: dto.id,

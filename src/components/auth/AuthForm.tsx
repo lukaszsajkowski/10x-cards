@@ -1,12 +1,5 @@
 import { Loader2 } from "lucide-react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AuthError } from "./AuthError";
 import { AuthFormFields } from "./AuthFormFields";
@@ -90,11 +83,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         </CardContent>
 
         <CardFooter className="flex flex-col gap-4 pt-6">
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={!isValid || isSubmitting}
-          >
+          <Button type="submit" className="w-full" disabled={!isValid || isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="size-4 animate-spin" />

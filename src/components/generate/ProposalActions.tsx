@@ -35,11 +35,7 @@ export const ProposalActions = memo(function ProposalActions({
         <Button variant="outline" size="sm" onClick={onEditToggle}>
           Anuluj
         </Button>
-        <Button
-          size="sm"
-          onClick={onEditToggle}
-          disabled={hasValidationErrors}
-        >
+        <Button size="sm" onClick={onEditToggle} disabled={hasValidationErrors}>
           <Save className="mr-2 h-4 w-4" />
           Zapisz
         </Button>

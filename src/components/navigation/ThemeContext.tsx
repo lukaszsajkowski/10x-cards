@@ -1,10 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
-import {
-  type Theme,
-  type ThemeContextValue,
-  THEME_STORAGE_KEY,
-  DEFAULT_THEME,
-} from "./types";
+import { type Theme, type ThemeContextValue, THEME_STORAGE_KEY, DEFAULT_THEME } from "./types";
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
@@ -32,7 +27,7 @@ export function ThemeProvider({
     }
 
     const stored = localStorage.getItem(storageKey) as Theme | null;
-    
+
     if (stored && (stored === "light" || stored === "dark")) {
       setThemeState(stored);
     } else {
@@ -40,7 +35,7 @@ export function ThemeProvider({
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       setThemeState(prefersDark ? "dark" : "light");
     }
-    
+
     setIsLoaded(true);
   }, [storageKey]);
 
@@ -51,13 +46,13 @@ export function ThemeProvider({
     }
 
     const root = document.documentElement;
-    
+
     if (theme === "dark") {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
-    
+
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey, isLoaded]);
 
@@ -69,11 +64,7 @@ export function ThemeProvider({
     setThemeState((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>{children}</ThemeContext.Provider>;
 }
 
 /**
@@ -82,10 +73,10 @@ export function ThemeProvider({
  */
 export function useThemeContext(): ThemeContextValue {
   const context = useContext(ThemeContext);
-  
+
   if (!context) {
     throw new Error("useThemeContext must be used within ThemeProvider");
   }
-  
+
   return context;
 }

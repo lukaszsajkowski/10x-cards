@@ -125,28 +125,16 @@ export const TEST_USERS = {
    */
   STANDARD: {
     // Prefer explicit E2E_USERNAME/E2E_PASSWORD from .env.test; fall back to legacy vars
-    email:
-      process.env.E2E_USERNAME ||
-      process.env.E2E_TEST_USER_EMAIL ||
-      "e2e-test@example.com",
-    password:
-      process.env.E2E_PASSWORD ||
-      process.env.E2E_TEST_USER_PASSWORD ||
-      "TestPassword123!",
+    email: process.env.E2E_USERNAME || process.env.E2E_TEST_USER_EMAIL || "e2e-test@example.com",
+    password: process.env.E2E_PASSWORD || process.env.E2E_TEST_USER_PASSWORD || "TestPassword123!",
   },
 
   /**
    * User with existing flashcards.
    */
   WITH_FLASHCARDS: {
-    email:
-      process.env.E2E_TEST_USER_WITH_DATA_EMAIL ||
-      process.env.E2E_USERNAME ||
-      "e2e-test-data@example.com",
-    password:
-      process.env.E2E_TEST_USER_WITH_DATA_PASSWORD ||
-      process.env.E2E_PASSWORD ||
-      "TestPassword123!",
+    email: process.env.E2E_TEST_USER_WITH_DATA_EMAIL || process.env.E2E_USERNAME || "e2e-test-data@example.com",
+    password: process.env.E2E_TEST_USER_WITH_DATA_PASSWORD || process.env.E2E_PASSWORD || "TestPassword123!",
   },
 } as const;
 

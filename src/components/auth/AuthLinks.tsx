@@ -30,19 +30,13 @@ export function AuthLinks({ mode }: AuthLinksProps) {
       )}
 
       {mode === "register" && (
-        <a
-          href="/auth/login"
-          className="text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
-        >
+        <a href="/auth/login" className="text-muted-foreground hover:text-primary underline-offset-4 hover:underline">
           Masz już konto? Zaloguj się
         </a>
       )}
 
       {mode === "reset-password" && (
-        <a
-          href="/auth/login"
-          className="text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
-        >
+        <a href="/auth/login" className="text-muted-foreground hover:text-primary underline-offset-4 hover:underline">
           Wróć do logowania
         </a>
       )}

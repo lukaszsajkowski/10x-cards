@@ -4,10 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-interface PasswordInputProps
-  extends Omit<React.ComponentProps<"input">, "type"> {
-  // Wszystkie propsy Input poza "type"
-}
+type PasswordInputProps = Omit<React.ComponentProps<"input">, "type">;
 
 export function PasswordInput({ className, ...props }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,11 +16,7 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
 
   return (
     <div className="relative">
-      <Input
-        type={showPassword ? "text" : "password"}
-        className={cn("pr-10", className)}
-        {...props}
-      />
+      <Input type={showPassword ? "text" : "password"} className={cn("pr-10", className)} {...props} />
       <Button
         type="button"
         variant="ghost"
@@ -34,11 +27,7 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
         aria-controls={buttonId}
         tabIndex={-1}
       >
-        {showPassword ? (
-          <EyeOff className="size-4" />
-        ) : (
-          <Eye className="size-4" />
-        )}
+        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
       </Button>
     </div>
   );

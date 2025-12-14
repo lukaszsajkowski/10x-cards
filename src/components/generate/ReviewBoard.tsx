@@ -6,12 +6,7 @@ import type { ReviewBoardProps, FlashcardProposalViewModel } from "./types";
  * Lista propozycji fiszek w formie edytowalnych kart.
  * Zarządza propagacją zmian do rodzica.
  */
-export function ReviewBoard({
-  proposals,
-  onProposalUpdate,
-  onProposalAccept,
-  onProposalReject,
-}: ReviewBoardProps) {
+export function ReviewBoard({ proposals, onProposalUpdate, onProposalAccept, onProposalReject }: ReviewBoardProps) {
   const handleUpdate = useCallback(
     (id: string) => (updates: Partial<FlashcardProposalViewModel>) => {
       onProposalUpdate(id, updates);
@@ -40,9 +35,7 @@ export function ReviewBoard({
   if (proposals.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">
-          Brak propozycji fiszek do wyświetlenia.
-        </p>
+        <p className="text-muted-foreground">Brak propozycji fiszek do wyświetlenia.</p>
       </div>
     );
   }

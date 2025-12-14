@@ -66,9 +66,7 @@ export class GeneratePage extends BasePage {
       name: /tekst źródłowy|source text|wprowadź tekst/i,
     });
     // Fallback for textarea without label
-    this.sourceTextInput = this.sourceTextInput.or(
-      page.locator("textarea").first()
-    );
+    this.sourceTextInput = this.sourceTextInput.or(page.locator("textarea").first());
     // Character counter shows format: "X / min-max" - find by pattern regardless of color class
     this.characterCounter = page.locator("span").filter({
       hasText: /\d[\d\s]*\/.*\d+.*-.*\d+/,
@@ -89,9 +87,9 @@ export class GeneratePage extends BasePage {
     this.reviewHeading = page.getByRole("heading", {
       name: /propozycje fiszek/i,
     });
-    this.sourceTextPreview = page.locator('[data-testid="source-text-preview"]').or(
-      page.locator('button').filter({ hasText: /pokaż tekst źródłowy|tekst źródłowy/i })
-    );
+    this.sourceTextPreview = page
+      .locator('[data-testid="source-text-preview"]')
+      .or(page.locator("button").filter({ hasText: /pokaż tekst źródłowy|tekst źródłowy/i }));
     // Proposals are listitem elements inside the proposals list
     this.proposalCards = page.getByRole("list", { name: /propozycji fiszek/i }).getByRole("listitem");
 
@@ -104,16 +102,24 @@ export class GeneratePage extends BasePage {
       name: /odrzuć wszystkie|reject all/i,
     });
     // Find accepted count text by pattern - "X fiszek gotowych do zapisania"
-    this.acceptedCountText = page.locator("*").filter({
-      hasText: /^\d+\s+fiszek?\s+gotow/i,
-    }).first();
+    this.acceptedCountText = page
+      .locator("*")
+      .filter({
+        hasText: /^\d+\s+fiszek?\s+gotow/i,
+      })
+      .first();
 
     // Success State
-    this.successAlert = page.getByRole("alert").filter({
-      hasText: /zapisane pomyślnie|saved successfully/i,
-    }).or(page.locator('[class*="alert"]').filter({
-      hasText: /zapisane|saved/i,
-    }));
+    this.successAlert = page
+      .getByRole("alert")
+      .filter({
+        hasText: /zapisane pomyślnie|saved successfully/i,
+      })
+      .or(
+        page.locator('[class*="alert"]').filter({
+          hasText: /zapisane|saved/i,
+        })
+      );
     this.newGenerationButton = page.getByRole("button", {
       name: /wygeneruj kolejne|generate more|nowa generacja/i,
     });
@@ -137,7 +143,7 @@ export class GeneratePage extends BasePage {
 
   /**
    * Fill the source text input with the given text.
-   * Uses pressSequentially which properly triggers React's controlled component updates.
+   * Uses evaluate for long texts to ensure proper React state updates across all browsers.
    */
   async fillSourceText(text: string): Promise<void> {
     // First clear any existing text (including localStorage restored text)
@@ -145,12 +151,35 @@ export class GeneratePage extends BasePage {
     await this.sourceTextInput.clear();
     await this.page.waitForTimeout(100);
 
-    // pressSequentially triggers keyboard events that React handles properly
-    // Use minimal delay - even 10000 chars at 0.5ms = 5 seconds
-    await this.sourceTextInput.pressSequentially(text, { delay: 0.5 });
+    // For long texts use evaluate to set value and trigger React events
+    const LONG_TEXT_THRESHOLD = 500;
 
-    // Wait for React state to sync
-    await this.page.waitForTimeout(100);
+    if (text.length > LONG_TEXT_THRESHOLD) {
+      // Use evaluate to set value directly and trigger React's synthetic events
+      await this.sourceTextInput.evaluate((el: HTMLTextAreaElement, value: string) => {
+        // Set the native value using React's internal setter
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLTextAreaElement.prototype,
+          "value"
+        )?.set;
+        if (nativeInputValueSetter) {
+          nativeInputValueSetter.call(el, value);
+        } else {
+          el.value = value;
+        }
+        // Dispatch input event to trigger React's onChange
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        el.dispatchEvent(new Event("change", { bubbles: true }));
+      }, text);
+
+      // Give React more time to process the long text and update state
+      await this.page.waitForTimeout(500);
+    } else {
+      // pressSequentially triggers keyboard events that React handles properly
+      await this.sourceTextInput.pressSequentially(text, { delay: 1 });
+      // Wait for React state to sync
+      await this.page.waitForTimeout(100);
+    }
 
     // Verify the value was set in DOM
     await expect(this.sourceTextInput).toHaveValue(text, { timeout: 5000 });
@@ -301,10 +330,7 @@ export class GeneratePage extends BasePage {
    */
   async editProposalFront(index: number, newText: string): Promise<void> {
     const card = this.getProposalCard(index);
-    const frontInput = card
-      .locator('label:has-text("Przód")')
-      .locator("..")
-      .locator("textarea");
+    const frontInput = card.locator('label:has-text("Przód")').locator("..").locator("textarea");
     await frontInput.click();
     await frontInput.clear();
     // Use pressSequentially for React controlled components
@@ -316,10 +342,7 @@ export class GeneratePage extends BasePage {
    */
   async editProposalBack(index: number, newText: string): Promise<void> {
     const card = this.getProposalCard(index);
-    const backInput = card
-      .locator('label:has-text("Tył")')
-      .locator("..")
-      .locator("textarea");
+    const backInput = card.locator('label:has-text("Tył")').locator("..").locator("textarea");
     await backInput.click();
     await backInput.clear();
     // Use pressSequentially for React controlled components
@@ -461,9 +484,7 @@ export class GeneratePage extends BasePage {
   /**
    * Get the current view state based on visible elements.
    */
-  async getCurrentViewState(): Promise<
-    "idle" | "generating" | "review" | "saving" | "success" | "error"
-  > {
+  async getCurrentViewState(): Promise<"idle" | "generating" | "review" | "saving" | "success" | "error"> {
     if (await this.successAlert.isVisible()) return "success";
     if (await this.errorAlert.isVisible()) return "error";
     if (await this.isGenerating()) return "generating";

@@ -18,10 +18,7 @@ export function SourceTextForm({
   const characterCount = sourceText.length;
 
   const isValid = useMemo(() => {
-    return (
-      characterCount >= VALIDATION_LIMITS.SOURCE_TEXT_MIN &&
-      characterCount <= VALIDATION_LIMITS.SOURCE_TEXT_MAX
-    );
+    return characterCount >= VALIDATION_LIMITS.SOURCE_TEXT_MIN && characterCount <= VALIDATION_LIMITS.SOURCE_TEXT_MAX;
   }, [characterCount]);
 
   const hasError = useMemo(() => {
@@ -41,12 +38,7 @@ export function SourceTextForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <SourceTextInput
-        value={sourceText}
-        onChange={onSourceTextChange}
-        disabled={isGenerating}
-        hasError={hasError}
-      />
+      <SourceTextInput value={sourceText} onChange={onSourceTextChange} disabled={isGenerating} hasError={hasError} />
 
       <CharacterCounter
         current={characterCount}

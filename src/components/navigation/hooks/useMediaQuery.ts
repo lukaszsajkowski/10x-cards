@@ -18,7 +18,7 @@ export function useMediaQuery(query: string): boolean {
     }
 
     const mediaQuery = window.matchMedia(query);
-    
+
     // Ustawienie początkowej wartości
     setMatches(mediaQuery.matches);
 

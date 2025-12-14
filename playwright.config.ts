@@ -9,9 +9,7 @@ const envFile = process.env.PLAYWRIGHT_ENV_FILE ?? ".env.test";
 const envPath = path.resolve(__dirname, envFile);
 
 if (!fs.existsSync(envPath)) {
-  throw new Error(
-    `Missing Playwright env file at ${envPath}. Provide ${envFile} before running E2E tests.`,
-  );
+  throw new Error(`Missing Playwright env file at ${envPath}. Provide ${envFile} before running E2E tests.`);
 }
 
 const parsedEnv = fs
@@ -26,7 +24,10 @@ const parsedEnv = fs
     }
 
     const key = line.slice(0, delimiterIndex).trim();
-    const value = line.slice(delimiterIndex + 1).trim().replace(/^['"]|['"]$/g, "");
+    const value = line
+      .slice(delimiterIndex + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, "");
 
     if (key && !(key in acc)) {
       acc[key] = value;

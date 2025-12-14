@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import { User, Settings, LogOut } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,21 +14,21 @@ import type { UserMenuProps } from "./types";
 /**
  * Skraca email do wyświetlenia - pokazuje początek + domenę
  */
-function truncateEmail(email: string, maxLength: number = 20): string {
+function truncateEmail(email: string, maxLength = 20): string {
   if (email.length <= maxLength) {
     return email;
   }
-  
+
   const [localPart, domain] = email.split("@");
   if (!domain) {
     return email.slice(0, maxLength - 3) + "...";
   }
-  
+
   const availableForLocal = maxLength - domain.length - 4; // -4 for "...@"
   if (availableForLocal < 3) {
     return email.slice(0, maxLength - 3) + "...";
   }
-  
+
   return `${localPart.slice(0, availableForLocal)}...@${domain}`;
 }
 
@@ -43,12 +43,7 @@ function getInitials(email: string): string {
 /**
  * Rozwijane menu użytkownika z avatarem/emailem, linkiem do ustawień i przyciskiem wylogowania
  */
-export const UserMenu = memo(function UserMenu({
-  email,
-  onLogout,
-  isOpen,
-  onOpenChange,
-}: UserMenuProps) {
+export const UserMenu = memo(function UserMenu({ email, onLogout, isOpen, onOpenChange }: UserMenuProps) {
   const displayEmail = email || "Użytkownik";
   const initials = email ? getInitials(email) : "U";
 
@@ -77,32 +72,27 @@ export const UserMenu = memo(function UserMenu({
           </span>
         </Button>
       </DropdownMenuTrigger>
-      
+
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">Konto</p>
-            <p className="text-xs leading-none text-muted-foreground truncate">
-              {displayEmail}
-            </p>
+            <p className="text-xs leading-none text-muted-foreground truncate">{displayEmail}</p>
           </div>
         </DropdownMenuLabel>
-        
+
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuItem asChild>
           <a href="/settings" className="flex items-center cursor-pointer">
             <Settings className="mr-2 h-4 w-4" />
             <span>Ustawienia</span>
           </a>
         </DropdownMenuItem>
-        
+
         <DropdownMenuSeparator />
-        
-        <DropdownMenuItem
-          onClick={handleLogout}
-          className="text-destructive focus:text-destructive cursor-pointer"
-        >
+
+        <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Wyloguj</span>
         </DropdownMenuItem>

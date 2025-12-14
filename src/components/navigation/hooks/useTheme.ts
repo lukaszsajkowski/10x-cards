@@ -31,7 +31,7 @@ export function useTheme(): UseThemeReturn {
     }
 
     const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-    
+
     if (stored && (stored === "light" || stored === "dark")) {
       setThemeState(stored);
     } else {
@@ -39,7 +39,7 @@ export function useTheme(): UseThemeReturn {
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       setThemeState(prefersDark ? "dark" : "light");
     }
-    
+
     setIsLoaded(true);
   }, []);
 
@@ -50,13 +50,13 @@ export function useTheme(): UseThemeReturn {
     }
 
     const root = document.documentElement;
-    
+
     if (theme === "dark") {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
-    
+
     localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme, isLoaded]);
 

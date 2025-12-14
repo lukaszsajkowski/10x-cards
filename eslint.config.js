@@ -1,6 +1,7 @@
 import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
-import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
+import eslintPluginPrettierBase from "eslint-plugin-prettier";
+import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginAstro from "eslint-plugin-astro";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import pluginReact from "eslint-plugin-react";
@@ -56,11 +57,31 @@ const reactConfig = tseslint.config({
   },
 });
 
-export default tseslint.config(
-  includeIgnoreFile(gitignorePath),
-  baseConfig,
-  jsxA11yConfig,
-  reactConfig,
-  eslintPluginAstro.configs["flat/recommended"],
-  eslintPluginPrettier
-);
+// Configure prettier for non-astro files only
+const prettierConfig = {
+  files: ["**/*.{js,jsx,ts,tsx,mjs,cjs}"],
+  plugins: {
+    prettier: eslintPluginPrettierBase,
+  },
+  rules: {
+    ...eslintConfigPrettier.rules,
+    "prettier/prettier": "error",
+    "arrow-body-style": "off",
+    "prefer-arrow-callback": "off",
+  },
+};
+
+// Disable prettier for astro inline scripts (eslint-plugin-astro adds these rules by default)
+const disablePrettierForAstroScripts = {
+  files: ["**/*.astro/*.js", "**/*.astro/*.ts", "*.astro/*.js", "*.astro/*.ts"],
+  rules: {
+    "prettier/prettier": "off",
+  },
+};
+
+export default [
+  ...tseslint.config(includeIgnoreFile(gitignorePath), baseConfig, jsxA11yConfig, reactConfig),
+  ...eslintPluginAstro.configs["flat/recommended"],
+  prettierConfig,
+  disablePrettierForAstroScripts,
+];

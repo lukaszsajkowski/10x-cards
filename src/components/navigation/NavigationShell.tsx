@@ -10,11 +10,7 @@ import type { NavigationShellProps } from "./types";
  * Wewnętrzna zawartość NavigationShell
  * Oddzielona, aby mieć dostęp do ThemeContext
  */
-function NavigationShellContent({
-  children,
-  currentPath,
-  userEmail,
-}: NavigationShellProps) {
+function NavigationShellContent({ children, currentPath, userEmail }: NavigationShellProps) {
   const { logout } = useAuth();
 
   const handleLogout = useCallback(async () => {
@@ -24,11 +20,7 @@ function NavigationShellContent({
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop: Sidebar */}
-      <Sidebar
-        currentPath={currentPath}
-        userEmail={userEmail}
-        onLogout={handleLogout}
-      />
+      <Sidebar currentPath={currentPath} userEmail={userEmail} onLogout={handleLogout} />
 
       {/* Mobile: TopBar */}
       <TopBar userEmail={userEmail} onLogout={handleLogout} />
@@ -56,17 +48,10 @@ function NavigationShellContent({
  * - Desktop (>= 768px): Sidebar po lewej stronie
  * - Mobile (< 768px): TopBar na górze + BottomNav na dole
  */
-export function NavigationShell({
-  children,
-  currentPath,
-  userEmail,
-}: NavigationShellProps) {
+export function NavigationShell({ children, currentPath, userEmail }: NavigationShellProps) {
   return (
     <ThemeProvider>
-      <NavigationShellContent
-        currentPath={currentPath}
-        userEmail={userEmail}
-      >
+      <NavigationShellContent currentPath={currentPath} userEmail={userEmail}>
         {children}
       </NavigationShellContent>
     </ThemeProvider>

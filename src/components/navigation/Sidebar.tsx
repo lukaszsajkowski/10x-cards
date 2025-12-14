@@ -49,13 +49,7 @@ function SidebarNav({ currentPath }: { currentPath: string }) {
 /**
  * Stopka sidebara z menu użytkownika i przełącznikiem motywu
  */
-function SidebarFooter({
-  userEmail,
-  onLogout,
-}: {
-  userEmail?: string;
-  onLogout: () => void;
-}) {
+function SidebarFooter({ userEmail, onLogout }: { userEmail?: string; onLogout: () => void }) {
   const { theme, toggleTheme } = useThemeContext();
 
   return (
@@ -74,11 +68,7 @@ function SidebarFooter({
  * Pionowy pasek boczny nawigacji widoczny na urządzeniach desktop (>= 768px)
  * Zawiera logo, główne linki nawigacyjne oraz sekcję użytkownika z przełącznikiem motywu
  */
-export const Sidebar = memo(function Sidebar({
-  currentPath,
-  userEmail,
-  onLogout,
-}: SidebarProps) {
+export const Sidebar = memo(function Sidebar({ currentPath, userEmail, onLogout }: SidebarProps) {
   return (
     <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar md:flex">
       <SidebarHeader />

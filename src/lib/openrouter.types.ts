@@ -1,91 +1,91 @@
-import type { z } from "zod"
+import type { z } from "zod";
 
 /**
  * Configuration for OpenRouter service
  */
 export interface OpenRouterConfig {
-  apiKey: string
-  baseUrl?: string
-  defaultModel?: string
-  defaultTemperature?: number
-  defaultMaxTokens?: number
-  timeout?: number
-  maxRetries?: number
+  apiKey: string;
+  baseUrl?: string;
+  defaultModel?: string;
+  defaultTemperature?: number;
+  defaultMaxTokens?: number;
+  timeout?: number;
+  maxRetries?: number;
 }
 
 /**
  * Parameters for chat completion requests
  */
 export interface ChatCompletionParams<T> {
-  systemMessage: string
-  userMessage: string
-  responseSchema: ResponseSchema<T>
-  model?: string
-  temperature?: number
-  maxTokens?: number
+  systemMessage: string;
+  userMessage: string;
+  responseSchema: ResponseSchema<T>;
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
 }
 
 /**
  * Response schema definition for structured outputs
  */
 export interface ResponseSchema<T> {
-  name: string
-  schema: z.ZodType<T>
+  name: string;
+  schema: z.ZodType<T>;
 }
 
 /**
  * Message in chat conversation
  */
 export interface ChatMessage {
-  role: "system" | "user" | "assistant"
-  content: string
+  role: "system" | "user" | "assistant";
+  content: string;
 }
 
 /**
  * Request payload sent to OpenRouter API
  */
 export interface OpenRouterRequestPayload {
-  model: string
-  messages: ChatMessage[]
-  response_format?: OpenRouterResponseFormat
-  temperature?: number
-  max_tokens?: number
-  top_p?: number
-  frequency_penalty?: number
-  presence_penalty?: number
+  model: string;
+  messages: ChatMessage[];
+  response_format?: OpenRouterResponseFormat;
+  temperature?: number;
+  max_tokens?: number;
+  top_p?: number;
+  frequency_penalty?: number;
+  presence_penalty?: number;
 }
 
 /**
  * JSON Schema response format configuration
  */
 export interface OpenRouterResponseFormat {
-  type: "json_schema"
+  type: "json_schema";
   json_schema: {
-    name: string
-    strict: boolean
-    schema: Record<string, unknown>
-  }
+    name: string;
+    strict: boolean;
+    schema: Record<string, unknown>;
+  };
 }
 
 /**
  * Raw response from OpenRouter API
  */
 export interface OpenRouterRawResponse {
-  id: string
-  model: string
-  choices: Array<{
-    index: number
+  id: string;
+  model: string;
+  choices: {
+    index: number;
     message: {
-      role: "assistant"
-      content: string
-    }
-    finish_reason: string
-  }>
+      role: "assistant";
+      content: string;
+    };
+    finish_reason: string;
+  }[];
   usage: {
-    prompt_tokens: number
-    completion_tokens: number
-    total_tokens: number
-  }
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
 }
 
 /**
@@ -105,4 +105,4 @@ export type OpenRouterErrorCode =
   | "SERVER_ERROR"
   | "NETWORK_ERROR"
   | "TIMEOUT"
-  | "UNKNOWN_ERROR"
+  | "UNKNOWN_ERROR";

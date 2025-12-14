@@ -1,12 +1,5 @@
 import { CheckCircle2, Mail } from "lucide-react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 interface ResetPasswordSuccessProps {
@@ -41,10 +34,7 @@ export function ResetPasswordSuccess({ message }: ResetPasswordSuccessProps) {
 
         <p className="text-center text-sm text-muted-foreground">
           Nie otrzymałeś wiadomości? Sprawdź folder spam lub{" "}
-          <a
-            href="/auth/reset-password"
-            className="text-primary underline-offset-4 hover:underline"
-          >
+          <a href="/auth/reset-password" className="text-primary underline-offset-4 hover:underline">
             spróbuj ponownie
           </a>
         </p>

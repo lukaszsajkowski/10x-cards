@@ -7,11 +7,10 @@ import type { Database } from "../src/db/database.types";
  * Playwright global teardown.
  * Cleans up Supabase tables that are mutated by E2E runs.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default async function globalTeardown(_config: FullConfig) {
   const supabaseUrl =
-    process.env.PLAYWRIGHT_SUPABASE_URL ??
-    process.env.PUBLIC_SUPABASE_URL ??
-    process.env.SUPABASE_URL;
+    process.env.PLAYWRIGHT_SUPABASE_URL ?? process.env.PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
 
   const supabaseKey =
     process.env.PLAYWRIGHT_SUPABASE_SERVICE_ROLE_KEY ??
@@ -20,9 +19,7 @@ export default async function globalTeardown(_config: FullConfig) {
     process.env.SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    console.warn(
-      "[PlaywrightTeardown] Skipping DB cleanup because SUPABASE_URL/SUPABASE_KEY are missing.",
-    );
+    console.warn("[PlaywrightTeardown] Skipping DB cleanup because SUPABASE_URL/SUPABASE_KEY are missing.");
     return;
   }
 
@@ -33,11 +30,7 @@ export default async function globalTeardown(_config: FullConfig) {
     },
   });
 
-  const tables: Array<keyof Database["public"]["Tables"]> = [
-    "flashcards",
-    "generation_error_logs",
-    "generations",
-  ];
+  const tables: (keyof Database["public"]["Tables"])[] = ["flashcards", "generation_error_logs", "generations"];
 
   for (const table of tables) {
     const { error } = await supabase.from(table).delete().not("id", "is", null);
@@ -50,4 +43,3 @@ export default async function globalTeardown(_config: FullConfig) {
 
   console.log("[PlaywrightTeardown] Database cleanup finished.");
 }
-

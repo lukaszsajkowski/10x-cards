@@ -9,11 +9,7 @@ import { TEST_USERS } from "./test-data";
 /**
  * Try to log in; if user does not exist, register and retry.
  */
-async function ensureTestUser(
-  page: Page,
-  email: string,
-  password: string
-): Promise<APIResponse> {
+async function ensureTestUser(page: Page, email: string, password: string): Promise<APIResponse> {
   const doLogin = () =>
     page.request.post("/api/auth/login", {
       data: { email, password },
@@ -39,11 +35,7 @@ async function ensureTestUser(
 /**
  * Helper to fill input and trigger React onChange properly.
  */
-async function fillInputWithReactSupport(
-  page: Page,
-  selector: string,
-  value: string
-): Promise<void> {
+async function fillInputWithReactSupport(page: Page, selector: string, value: string): Promise<void> {
   const input = page.locator(selector);
   await input.click();
   await input.clear();
@@ -114,10 +106,7 @@ export async function isAuthenticated(page: Page): Promise<boolean> {
  * Setup authenticated state that can be reused across tests.
  * Use this in globalSetup to create a storageState file.
  */
-export async function setupAuthenticatedState(
-  page: Page,
-  storageStatePath: string
-): Promise<void> {
+export async function setupAuthenticatedState(page: Page, storageStatePath: string): Promise<void> {
   await loginViaUI(page);
   await page.context().storageState({ path: storageStatePath });
 }
@@ -125,10 +114,8 @@ export async function setupAuthenticatedState(
 /**
  * Create a new browser context with pre-authenticated state.
  */
-export async function createAuthenticatedContext(
-  context: BrowserContext,
-  storageStatePath: string
-): Promise<BrowserContext> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function createAuthenticatedContext(context: BrowserContext, _: string): Promise<BrowserContext> {
   // This would be used if we had pre-saved storage state
   // For now, we'll login fresh in each test suite
   return context;

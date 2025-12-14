@@ -19,13 +19,13 @@ export const prerender = false;
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content="10x Cards - Generuj fiszki edukacyjne z pomocą AI" />
     <title>{title}</title>
-    
+
     <!-- Prevent flash of unstyled content for theme -->
     <script is:inline>
-      (function() {
-        const theme = localStorage.getItem('10x-cards-theme');
-        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark');
+      (function () {
+        const theme = localStorage.getItem("10x-cards-theme");
+        if (theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+          document.documentElement.classList.add("dark");
         }
       })();
     </script>
@@ -36,11 +36,9 @@ export const prerender = false;
         <h1 class="text-3xl font-bold tracking-tight">
           <span class="text-primary">10x</span> Cards
         </h1>
-        <p class="mt-2 text-muted-foreground">
-          Generuj fiszki edukacyjne z pomocą AI
-        </p>
+        <p class="mt-2 text-muted-foreground">Generuj fiszki edukacyjne z pomocą AI</p>
       </div>
-      
+
       <slot />
     </main>
   </body>

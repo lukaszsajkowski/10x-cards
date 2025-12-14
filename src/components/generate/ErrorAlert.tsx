@@ -7,10 +7,7 @@ import type { ErrorAlertProps } from "./types";
 /**
  * Komponent wyświetlający komunikaty błędów z możliwością zamknięcia.
  */
-export const ErrorAlert = memo(function ErrorAlert({
-  message,
-  onDismiss,
-}: ErrorAlertProps) {
+export const ErrorAlert = memo(function ErrorAlert({ message, onDismiss }: ErrorAlertProps) {
   return (
     <Alert variant="destructive" className="relative">
       <AlertCircle className="h-4 w-4" />

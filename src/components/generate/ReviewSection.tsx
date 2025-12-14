@@ -22,19 +22,14 @@ export function ReviewSection({
   // Sprawdź czy którakolwiek zaakceptowana propozycja ma błędy walidacji
   const hasValidationErrors = useMemo(() => {
     return proposals.some(
-      (p) =>
-        p.isAccepted &&
-        !p.isRejected &&
-        (p.validationErrors.front || p.validationErrors.back)
+      (p) => p.isAccepted && !p.isRejected && (p.validationErrors.front || p.validationErrors.back)
     );
   }, [proposals]);
 
   return (
     <section aria-label="Recenzja propozycji fiszek" className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">
-          Propozycje fiszek ({proposals.length})
-        </h2>
+        <h2 className="text-xl font-semibold">Propozycje fiszek ({proposals.length})</h2>
       </div>
 
       <SourceTextPreview text={sourceText} />

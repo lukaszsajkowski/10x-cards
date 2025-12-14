@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { test as base } from "@playwright/test";
 import { HomePage } from "../pages/home.page";
 import { LoginPage } from "../pages/login.page";
@@ -17,12 +18,12 @@ import { GeneratePage } from "../pages/generate.page";
  * });
  * ```
  */
-type Fixtures = {
+interface Fixtures {
   homePage: HomePage;
   loginPage: LoginPage;
   flashcardsPage: FlashcardsPage;
   generatePage: GeneratePage;
-};
+}
 
 export const test = base.extend<Fixtures>({
   homePage: async ({ page }, use) => {

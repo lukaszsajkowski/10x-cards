@@ -20,12 +20,7 @@ export default defineConfig({
     include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
 
     // Exclude patterns
-    exclude: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/e2e/**",
-      "**/.{idea,git,cache,output,temp}/**",
-    ],
+    exclude: ["**/node_modules/**", "**/dist/**", "**/e2e/**", "**/.{idea,git,cache,output,temp}/**"],
 
     // Global test configuration
     globals: true,

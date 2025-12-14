@@ -23,28 +23,18 @@ export const BulkActionsBar = memo(function BulkActionsBar({
             {acceptedCount === 0 ? (
               <span>Brak zaakceptowanych fiszek do zapisania</span>
             ) : hasValidationErrors ? (
-              <span className="text-destructive">
-                Popraw błędy walidacji przed zapisaniem
-              </span>
+              <span className="text-destructive">Popraw błędy walidacji przed zapisaniem</span>
             ) : (
               <span>
                 {acceptedCount}{" "}
-                {acceptedCount === 1
-                  ? "fiszka gotowa"
-                  : acceptedCount < 5
-                    ? "fiszki gotowe"
-                    : "fiszek gotowych"}{" "}
-                do zapisania
+                {acceptedCount === 1 ? "fiszka gotowa" : acceptedCount < 5 ? "fiszki gotowe" : "fiszek gotowych"} do
+                zapisania
               </span>
             )}
           </div>
 
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={onRejectAll}
-              disabled={isSaving}
-            >
+            <Button variant="outline" onClick={onRejectAll} disabled={isSaving}>
               <Trash2 className="mr-2 h-4 w-4" />
               Odrzuć wszystkie
             </Button>

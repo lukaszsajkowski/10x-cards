@@ -8,12 +8,7 @@ import type {
   AuthFormState,
   AuthFormActions,
 } from "../types";
-import {
-  AUTH_VALIDATION,
-  AUTH_ERROR_MESSAGES,
-  SUPABASE_ERROR_MESSAGES,
-  AUTH_SUCCESS_MESSAGES,
-} from "../types";
+import { AUTH_VALIDATION, AUTH_ERROR_MESSAGES, SUPABASE_ERROR_MESSAGES, AUTH_SUCCESS_MESSAGES } from "../types";
 
 /**
  * Wywołuje API endpoint auth i zwraca wynik
@@ -108,15 +103,12 @@ export function useAuthForm(mode: AuthMode): ExtendedAuthFormState & AuthFormAct
   }, []);
 
   // Akcje
-  const setFieldValue = useCallback(
-    (field: keyof AuthFormData, value: string) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-      // Wyczyść błąd auth przy edycji
-      setAuthError(null);
-      setSuccessMessage(null);
-    },
-    []
-  );
+  const setFieldValue = useCallback((field: keyof AuthFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Wyczyść błąd auth przy edycji
+    setAuthError(null);
+    setSuccessMessage(null);
+  }, []);
 
   const setFieldTouched = useCallback((field: keyof AuthFormData) => {
     setTouched((prev) => ({ ...prev, [field]: true }));

@@ -11,9 +11,7 @@ export function GenerationLoader({ skeletonCount = 3 }: GenerationLoaderProps) {
     <div className="space-y-6">
       <div className="flex items-center gap-2">
         <Skeleton className="h-4 w-4 rounded-full animate-pulse" />
-        <p className="text-sm text-muted-foreground">
-          Generowanie propozycji fiszek... To może potrwać do minuty.
-        </p>
+        <p className="text-sm text-muted-foreground">Generowanie propozycji fiszek... To może potrwać do minuty.</p>
       </div>
 
       <div className="grid gap-4">

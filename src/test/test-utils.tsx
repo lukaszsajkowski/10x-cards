@@ -15,9 +15,7 @@ function AllProviders({ children }: ProvidersProps) {
     // Add your providers here
     // <ThemeProvider>
     //   <AuthProvider>
-    <>
-      {children}
-    </>
+    <>{children}</>
     //   </AuthProvider>
     // </ThemeProvider>
   );
@@ -31,10 +29,7 @@ function AllProviders({ children }: ProvidersProps) {
  * const { getByRole } = renderWithProviders(<MyComponent />);
  * ```
  */
-function renderWithProviders(
-  ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
-) {
+function renderWithProviders(ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) {
   return render(ui, { wrapper: AllProviders, ...options });
 }
 

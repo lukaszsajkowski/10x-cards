@@ -18,8 +18,8 @@ export function EmptyState() {
 
       {/* Tekst pomocniczy */}
       <p className="text-muted-foreground mb-8 max-w-md">
-        Nie masz jeszcze żadnych wygenerowanych fiszek. Rozpocznij generowanie
-        fiszek z pomocą AI, aby zobaczyć tutaj historię.
+        Nie masz jeszcze żadnych wygenerowanych fiszek. Rozpocznij generowanie fiszek z pomocą AI, aby zobaczyć tutaj
+        historię.
       </p>
 
       {/* Przycisk CTA */}

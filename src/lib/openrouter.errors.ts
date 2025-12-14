@@ -1,4 +1,4 @@
-import type { OpenRouterErrorCode } from "./openrouter.types"
+import type { OpenRouterErrorCode } from "./openrouter.types";
 
 /**
  * Base error class for OpenRouter service
@@ -7,10 +7,10 @@ export class OpenRouterError extends Error {
   constructor(
     message: string,
     public readonly code: OpenRouterErrorCode,
-    public readonly cause?: unknown,
+    public readonly cause?: unknown
   ) {
-    super(message)
-    this.name = "OpenRouterError"
+    super(message);
+    this.name = "OpenRouterError";
   }
 }
 
@@ -19,8 +19,8 @@ export class OpenRouterError extends Error {
  */
 export class OpenRouterConfigError extends OpenRouterError {
   constructor(message: string) {
-    super(message, "CONFIG_ERROR")
-    this.name = "OpenRouterConfigError"
+    super(message, "CONFIG_ERROR");
+    this.name = "OpenRouterConfigError";
   }
 }
 
@@ -29,8 +29,8 @@ export class OpenRouterConfigError extends OpenRouterError {
  */
 export class OpenRouterAuthError extends OpenRouterError {
   constructor(message: string, code: "UNAUTHORIZED" | "FORBIDDEN") {
-    super(message, code)
-    this.name = "OpenRouterAuthError"
+    super(message, code);
+    this.name = "OpenRouterAuthError";
   }
 }
 
@@ -41,10 +41,10 @@ export class OpenRouterRateLimitError extends OpenRouterError {
   constructor(
     message: string,
     code: "RATE_LIMITED",
-    public readonly retryAfter: number,
+    public readonly retryAfter: number
   ) {
-    super(message, code)
-    this.name = "OpenRouterRateLimitError"
+    super(message, code);
+    this.name = "OpenRouterRateLimitError";
   }
 }
 
@@ -53,8 +53,8 @@ export class OpenRouterRateLimitError extends OpenRouterError {
  */
 export class OpenRouterQuotaError extends OpenRouterError {
   constructor(message: string, code: "QUOTA_EXCEEDED") {
-    super(message, code)
-    this.name = "OpenRouterQuotaError"
+    super(message, code);
+    this.name = "OpenRouterQuotaError";
   }
 }
 
@@ -63,8 +63,8 @@ export class OpenRouterQuotaError extends OpenRouterError {
  */
 export class OpenRouterRequestError extends OpenRouterError {
   constructor(message: string, code: "BAD_REQUEST" | "MODEL_NOT_FOUND") {
-    super(message, code)
-    this.name = "OpenRouterRequestError"
+    super(message, code);
+    this.name = "OpenRouterRequestError";
   }
 }
 
@@ -72,12 +72,9 @@ export class OpenRouterRequestError extends OpenRouterError {
  * Response error - empty response, invalid JSON, or validation failed
  */
 export class OpenRouterResponseError extends OpenRouterError {
-  constructor(
-    message: string,
-    code: "EMPTY_RESPONSE" | "INVALID_JSON" | "VALIDATION_FAILED",
-  ) {
-    super(message, code)
-    this.name = "OpenRouterResponseError"
+  constructor(message: string, code: "EMPTY_RESPONSE" | "INVALID_JSON" | "VALIDATION_FAILED") {
+    super(message, code);
+    this.name = "OpenRouterResponseError";
   }
 }
 
@@ -86,8 +83,8 @@ export class OpenRouterResponseError extends OpenRouterError {
  */
 export class OpenRouterServerError extends OpenRouterError {
   constructor(message: string, code: "SERVER_ERROR") {
-    super(message, code)
-    this.name = "OpenRouterServerError"
+    super(message, code);
+    this.name = "OpenRouterServerError";
   }
 }
 
@@ -96,7 +93,7 @@ export class OpenRouterServerError extends OpenRouterError {
  */
 export class OpenRouterNetworkError extends OpenRouterError {
   constructor(message: string, code: "NETWORK_ERROR" | "TIMEOUT") {
-    super(message, code)
-    this.name = "OpenRouterNetworkError"
+    super(message, code);
+    this.name = "OpenRouterNetworkError";
   }
 }

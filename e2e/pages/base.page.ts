@@ -33,20 +33,14 @@ export abstract class BasePage {
   /**
    * Get a locator for an element by role.
    */
-  protected getByRole(
-    role: Parameters<Page["getByRole"]>[0],
-    options?: Parameters<Page["getByRole"]>[1]
-  ): Locator {
+  protected getByRole(role: Parameters<Page["getByRole"]>[0], options?: Parameters<Page["getByRole"]>[1]): Locator {
     return this.page.getByRole(role, options);
   }
 
   /**
    * Get a locator for an element by text.
    */
-  protected getByText(
-    text: string | RegExp,
-    options?: Parameters<Page["getByText"]>[1]
-  ): Locator {
+  protected getByText(text: string | RegExp, options?: Parameters<Page["getByText"]>[1]): Locator {
     return this.page.getByText(text, options);
   }
 
